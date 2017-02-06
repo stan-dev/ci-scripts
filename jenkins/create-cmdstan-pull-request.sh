@@ -22,7 +22,7 @@ parse_github_issue_number() {
 }
 
 parse_existing_github_issue_and_pr_numbers() {
-  numbers=($(echo "$1" | grep -o '/issues/[0-9]*\"' | sed 's|/issues/\([0-9]*\)\"|\1|g'))
+  numbers=($(echo "$1" | python github_pr_and_issue_number.py))
   github_pr_number=${numbers[0]}
   github_issue_number=${numbers[1]}
 }
@@ -77,7 +77,6 @@ if github_issue_exists "${response}"; then
   ########################################
 
   parse_existing_github_issue_and_pr_numbers "${response}"
-  
 else
   ########################################
   ## Create GitHub issue
@@ -107,17 +106,27 @@ $response
   parse_github_issue_number "${response}"
 fi
 
+
+echo "Issue        #"${github_issue_number}
+echo "Pull request #"${github_pr_number}
+
+if [ "${github_issue_number}" == "None" ]; then
+  echo "Can't find an issue number"
+  trap : 0
+  exit 1
+fi
+
 ########################################
 ## Fix issue on a branch:
 ## - Create a git branch
 ## - Update the Stan Library to develop
 ## - Commit and push
 ########################################
-if [ ! -z "$github_pr_number" ]; then  
+if [ "$github_pr_number" == "None" ]; then
+  git checkout -b feature/issue-${github_issue_number}-update-stan
+else
   git checkout feature/issue-${github_issue_number}-update-stan
   git pull --ff
-else
-  git checkout -b feature/issue-${github_issue_number}-update-stan
 fi
 pushd stan > /dev/null
 git checkout ${stan_commit_hash}
@@ -162,7 +171,6 @@ fi
 
 trap : 0 
 
-
 echo "------------------------------------------------------------"
 echo ""
 echo "  Success creating a pull request updating submodule"
@@ -171,5 +179,3 @@ echo "------------------------------------------------------------"
 echo ""
 
 exit 0
-
-

@@ -69,7 +69,6 @@ if [ "$original_commit_hash" == "$math_commit_hash" ]; then
   exit 0
 fi
 
-
 response=$(eval curl -G 'https://api.github.com/repos/stan-dev/stan/issues?creator=stan-buildbot')
 
 if github_issue_exists "${response}"; then
@@ -78,11 +77,11 @@ if github_issue_exists "${response}"; then
   ########################################
   
   parse_existing_github_issue_and_pr_numbers "${response}"
-
 else
   ########################################
   ## Create GitHub issue
   ########################################
+
   issue="{ 
   \"title\": \"Update submodule for the Stan Math Library\",
   \"body\":  \"The Stan Math Library develop branch has been updated.\nUpdate the submodule to ${math_commit_hash}.\" }"
