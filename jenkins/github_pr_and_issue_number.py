@@ -4,7 +4,7 @@ import json
 import sys
 
 if __name__ == "__main__":
-    issues = json.load(sys.stdin)
+    issues = json.load(sys.stdin, strict=False)
     pr, i = None, None
     for issue in issues:
         if pr and i:
