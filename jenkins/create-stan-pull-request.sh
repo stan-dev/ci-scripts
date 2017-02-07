@@ -4,7 +4,6 @@ trap 'abort' 0
 
 set -e
 
-
 ########################################
 ## Functions
 ########################################
@@ -23,11 +22,10 @@ parse_github_issue_number() {
 }
 
 parse_existing_github_issue_and_pr_numbers() {
-  numbers=($(echo "$1" | grep -o '/issues/[0-9]*\"' | sed 's|/issues/\([0-9]*\)\"|\1|g'))
+  numbers=($(echo "$1" | python github_pr_and_issue_number.py))
   github_pr_number=${numbers[0]}
   github_issue_number=${numbers[1]}
 }
-
 
 ########################################
 ## Echo
@@ -75,7 +73,7 @@ if github_issue_exists "${response}"; then
   ########################################
   ## Update existing GitHub issue
   ########################################
-  
+
   parse_existing_github_issue_and_pr_numbers "${response}"
 else
   ########################################
@@ -110,7 +108,7 @@ fi
 echo "Issue        #"${github_issue_number}
 echo "Pull request #"${github_pr_number}
 
-if [ -z "${github_issue_number}" ]; then
+if [ "${github_issue_number}" == "None" ]; then
   echo "Can't find an issue number"
   trap : 0
   exit 1
@@ -122,11 +120,11 @@ fi
 ## - Update the Math Library to develop
 ## - Commit and push
 ########################################
-if [ ! -z "$github_pr_number" ]; then  
+if [ "$github_pr_number" == "None" ]; then
+  git checkout -b feature/issue-${github_issue_number}-update-math
+else
   git checkout feature/issue-${github_issue_number}-update-math
   git pull --ff
-else
-  git checkout -b feature/issue-${github_issue_number}-update-math
 fi
 pushd lib/stan_math > /dev/null
 git checkout ${math_commit_hash}
@@ -136,7 +134,7 @@ git commit -m "Fixes #${github_issue_number}. Updates the Math submodule to ${ma
 git push --set-upstream origin feature/issue-${github_issue_number}-update-math
 
 
-if [ -z "$github_pr_number" ]; then
+if [ "$github_pr_number" == "None" ]; then
   ########################################
   ## Create pull request
   ########################################
