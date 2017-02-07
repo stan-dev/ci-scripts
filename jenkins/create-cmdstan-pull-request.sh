@@ -136,7 +136,7 @@ git commit -m "Fixes #${github_issue_number}. Updates the Stan submodule to ${st
 git push --set-upstream origin feature/issue-${github_issue_number}-update-stan
 
 
-if [ -z "$github_pr_number" ]; then
+if [ "$github_pr_number" == "None" ]; then
   ########################################
   ## Create pull request
   ########################################
