@@ -17,10 +17,12 @@ curl_success() {
   [[ "$code" -eq "201" ]] || [[ "$code" -eq "200" ]]
 }
 
+github_issue_number=None
 parse_github_issue_number() {
   github_issue_number=$(sed -n "s,.*/issues/\([0-9]*\)\".*,\1,p" <<< "$1" | head -n1)
 }
 
+github_pr_number=None
 parse_existing_github_issue_and_pr_numbers() {
   numbers=($(echo "$1" | python github_pr_and_issue_number.py))
   github_pr_number=${numbers[0]}
