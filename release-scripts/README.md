@@ -27,6 +27,7 @@ Non-interactive will require the user to specify these variables.
   - src/docs/stan-reference/programming.tex
   - src/docs/stan-reference/stan-reference.tex
   - src/doxygen/doxygen.cfg
+4. update RELEASE_NOTES.txt
 4. git add and commit changed files
 5. build documentation
   - doc/stan*.pdf
