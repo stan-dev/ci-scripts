@@ -4,7 +4,7 @@
 
 trap 'abort' 0
 
-set -e
+set -e -u
 
 ## define variables
 cmdstan_directory=
@@ -17,7 +17,7 @@ github_password=
 
 
 # ## internal variables
-tag_github_url=https://github.com/stan-dev/cmdstan.git
+tag_github_url=git@github.com:stan-dev/cmdstan.git
 tag_github_api_url=https://api.github.com/repos/stan-dev/cmdstan
 _msg=""
 _steps[0]="Set up variables."
@@ -187,7 +187,7 @@ pushd $cmdstan_directory > /dev/null
 old_stan_dir=stan
 if [[ $old_stan_dir != stan_$stan_version ]]; then
   git mv $old_stan_dir stan_$stan_version
-  sed -i '' 's|STAN ?=\(.*\)'$old_stan_dir'|STAN ?=\1stan_'$stan_version'|g' makefile  
+  sed -i '' 's|STAN ?=\(.*\)'$old_stan_dir'|STAN ?=\1stan_'$stan_version'|g' makefile
   sed -i '' 's|\(.*\) stan/|\1 stan_'$stan_version'/|g' test-all.sh
   git add makefile test-all.sh
   git commit -m "moving stan to stan_$stan_version"
@@ -225,7 +225,7 @@ popd > /dev/null
 ########################################
 ## 4. Update version numbers
 ########################################
-print_step 3
+print_step 4
 _msg="Updating version numbers"
 pushd $cmdstan_directory > /dev/null
 
@@ -373,7 +373,7 @@ git commit -m "Removing built documentation"
 ## move back stan version and change makefile
 rm -rf stan_$stan_version
 git checkout -- stan_$stan_version
-git mv stan_$stan_version $old_stan_dir 
+git mv stan_$stan_version $old_stan_dir
 sed -i '' 's|STAN ?=\(.*\)stan_'$stan_version'\(.*\)|STAN ?=\1'$old_stan_dir'\2|g' makefile
 sed -i '' 's|MATH ?=\(.*\)stan_math'$math_version'/|MATH ?=\1stan_math/|g' makefile
 sed -i '' 's|\(.*\) stan_'$stan_version'/|\1 stan/|g' test-all.sh
@@ -431,7 +431,7 @@ popd > /dev/null
 ## Done
 ########################################
 
-trap : 0 
+trap : 0
 
 
 echo "------------------------------------------------------------"
@@ -440,5 +440,3 @@ echo "Success tagging CmdStan v$version!"
 
 
 exit 0
-
-

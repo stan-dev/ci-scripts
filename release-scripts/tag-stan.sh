@@ -4,7 +4,7 @@
 
 trap 'abort' 0
 
-set -e
+set -e -u
 
 ## define variables
 stan_directory=
@@ -16,7 +16,7 @@ github_password=
 
 
 ## internal variables
-tag_github_url=https://github.com/stan-dev/stan.git
+tag_github_url=git@github.com:stan-dev/stan.git
 tag_github_api_url=https://api.github.com/repos/stan-dev/stan
 _msg=""
 _steps[0]="Set up variables."
@@ -238,6 +238,8 @@ replace_version $(grep -rlF --exclude={*.hpp,*.cpp} "$old_version" $stan_directo
 replace_version .github/ISSUE_TEMPLATE.md
 replace_version_test
 
+wait_for_input "Go ahead and edit RELEASE_NOTES.txt now."
+
 popd > /dev/null
 
 
@@ -439,7 +441,7 @@ popd > /dev/null
 ## Done
 ########################################
 
-trap : 0 
+trap : 0
 
 
 echo "------------------------------------------------------------"
@@ -448,5 +450,3 @@ echo "Success tagging Stan v$version!"
 
 
 exit 0
-
-
