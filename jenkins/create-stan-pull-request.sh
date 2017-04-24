@@ -29,6 +29,39 @@ parse_existing_github_issue_and_pr_numbers() {
   github_issue_number=${numbers[1]}
 }
 
+tag_github_api_url='https://api.github.com/repos/stan-dev/stan'
+
+# XXX stolen from ../release-scripts/functions.sh
+## merges a pull request
+## uses
+##  $github_user
+##  $github_token
+##  $tag_github_api_url
+##
+## arguments
+##  $1: pull request number
+##  $2: commit message for the merge
+merge_pull_request() {
+  echo $tag_github_api_url/pulls/$1/merge
+  data="{ \"commit_message\": \"$2\" }"
+  echo $data
+
+  response=$(eval curl -i --user \"$github_user:$github_token\" --request PUT --data \'$data\' $tag_github_api_url/pulls/$1/merge)
+
+  if ! curl_success "${response}"; then
+    _msg="
+Error merging pull request:
+----------------------------
+$data
+
+Response:
+---------
+$response
+"
+    exit 1
+  fi
+}
+
 ########################################
 ## Echo
 ########################################
@@ -165,6 +198,13 @@ $response
   fi
 
 fi
+
+########################################
+## Merge the pull request
+########################################
+
+merge_pull_request $github_pr_number "Automatically bumping math library."
+
 ########################################
 ## Done
 ########################################
