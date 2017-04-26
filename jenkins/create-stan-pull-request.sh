@@ -166,7 +166,7 @@ pushd lib/stan_math > /dev/null
 git checkout ${math_commit_hash}
 popd > /dev/null
 git add lib/stan_math
-git commit -m "Fixes #${github_issue_number}. Updates the Math submodule to ${math_commit_hash}." lib/stan_math
+git commit -m "Fixes #${github_issue_number}. Updates the Math submodule to ${math_commit_hash}. [ci-skip]" lib/stan_math
 git push --set-upstream origin feature/issue-${github_issue_number}-update-math
 
 
@@ -206,7 +206,7 @@ fi
 ## Merge the pull request
 ########################################
 
-merge_pull_request $github_pr_number "Automatically bumping math library."
+merge_pull_request $github_pr_number "Automatically bumping math library.  [ci-skip]"
 
 ########################################
 ## Done
