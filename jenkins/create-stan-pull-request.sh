@@ -197,7 +197,8 @@ $response
     trap : 0 
     exit 1
   else
-    parse_existing_github_issue_and_pr_numbers response
+    echo "Response: ${response}"
+    parse_existing_github_issue_and_pr_numbers "${response}"
   fi
 fi
 
