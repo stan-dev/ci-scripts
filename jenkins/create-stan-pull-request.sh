@@ -42,11 +42,12 @@ tag_github_api_url='https://api.github.com/repos/stan-dev/stan'
 ##  $1: pull request number
 ##  $2: commit message for the merge
 merge_pull_request() {
-  echo $tag_github_api_url/pulls/$1/merge
+  url=$tag_github_api_url/pulls/$1/merge
+  echo $url
   data="{ \"commit_message\": \"$2\" }"
   echo $data
 
-  response=$(eval curl -i --user \"$github_user:$github_token\" --request PUT --data \'$data\' $tag_github_api_url/pulls/$1/merge)
+  response=$(eval curl -i --user \"$github_user:$github_token\" --request PUT --data \'$data\' $url)
 
   if ! curl_success "${response}"; then
     _msg="
@@ -102,7 +103,7 @@ if [ "$original_commit_hash" == "$math_commit_hash" ]; then
   exit 0
 fi
 
-response=$(eval curl -G 'https://api.github.com/repos/stan-dev/stan/issues?creator=stan-buildbot')
+response=$(eval curl -G '$tag_github_api_url/issues?creator=stan-buildbot')
 
 if github_issue_exists "${response}"; then
   ########################################
@@ -119,7 +120,7 @@ else
   \"title\": \"Update submodule for the Stan Math Library\",
   \"body\":  \"The Stan Math Library develop branch has been updated.\nUpdate the submodule to ${math_commit_hash}.\" }"
 
-  response=$(eval curl --include --user \"$github_user:$github_token\" --request POST --data \'$issue\' https://api.github.com/repos/stan-dev/stan/issues)
+  response=$(eval curl --include --user \"$github_user:$github_token\" --request POST --data \'$issue\' $tag_github_api_url/issues)
 
 
   if ! curl_success "${response}"; then
@@ -180,7 +181,7 @@ if [ "$github_pr_number" == "None" ]; then
   \"base\": \"develop\",
   \"body\": \"#### Summary:\n\nUpdates the Math submodule to the current develop version, ${math_commit_hash}.\n\n#### Intended Effect:\n\nThe Stan Math Library \`develop\` branch has been updated.\nThis pull request updates the submodule for the Stan Math Library submodule to ${math_commit_hash}.\n\n#### Side Effects:\n\nNone.\n\n#### Documentation:\n\nNone.\n\n#### Reviewer Suggestions: \n\nNone.\" }"
 
-  response=$(eval curl --include --user \"$github_user:$github_token\" --request POST --data \'$pull_request\' https://api.github.com/repos/stan-dev/stan/pulls)
+  response=$(eval curl --include --user \"$github_user:$github_token\" --request POST --data \'$pull_request\' $tag_github_api_url/pulls)
 
   if ! curl_success "${response}"; then
     _msg="
@@ -195,8 +196,9 @@ $response
 "
     trap : 0 
     exit 1
+  else
+    parse_existing_github_issue_and_pr_numbers response
   fi
-
 fi
 
 ########################################
