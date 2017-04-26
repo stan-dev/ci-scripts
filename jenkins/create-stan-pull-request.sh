@@ -47,7 +47,7 @@ pushd lib/stan_math > /dev/null
 git checkout ${math_commit_hash}
 popd > /dev/null
 git add lib/stan_math
-git commit -m "Updates the Math submodule to ${math_commit_hash}. [ci-skip]" lib/stan_math
+git commit -m "Updates the Math submodule to ${math_commit_hash}." lib/stan_math
 git push origin develop
 
 ########################################
