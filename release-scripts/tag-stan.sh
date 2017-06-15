@@ -11,13 +11,10 @@ stan_directory=
 old_version=
 version=
 math_version=
-github_user=
-github_password=
 
 
 ## internal variables
 tag_github_url=git@github.com:stan-dev/stan.git
-tag_github_api_url=https://api.github.com/repos/stan-dev/stan
 _msg=""
 _steps[0]="Set up variables."
 _steps[1]="Verify Stan is clean and up to date"
@@ -25,32 +22,10 @@ _steps[2]="Create release branch using git."
 _steps[3]="Update Stan Math Library to tagged version."
 _steps[4]="Replace uses of old version number with new version number."
 _steps[5]="Git add and commit changed files."
-_steps[6]="Build documentation."
-_steps[7]="Git add and commit build documentation."
 _steps[8]="Test build. Git push."
-_steps[9]="Create GitHub pull request."
-_steps[10]="Merge GitHub pull request."
 _steps[11]="Git tag version."
 _steps[12]="Update master branch to new version"
-_steps[13]="Create a zip file to upload"
-_steps[14]="Create GitHub issue to remove documentation."
-_steps[15]="Create git branch to remove documentation"
-_steps[16]="Create GitHub pull request to remove documentation."
-_steps[17]="Merge GitHub pull request to remove documentation."
-
-echo ""
-echo "---------- Script to Tag Stan ----------"
-echo ""
-echo "  Steps in this script:"
-for ((n = 0; n < ${#_steps[@]}; n++))
-do
-  if [[ $n -lt 10 ]]; then
-    echo "     "$n: ${_steps[$n]}
-  else
-    echo "    "$n: ${_steps[$n]}
-  fi
-done
-echo ""
+_steps[13]="Build manual. Manual upload of manual."
 
 ########################################
 ## 0: Set up variables
@@ -139,19 +114,6 @@ if [[ -z $math_version ]]; then
   fi
 fi
 
-## read GitHub user name
-_msg="Reading GitHub user name"
-if [[ -z $github_user ]]; then
-  read -p "  Github user name: " github_user
-fi
-
-## read GitHub user name
-_msg="Reading Github password"
-if [[ -z $github_password ]]; then
-  read -s -p "  Github password (user: $github_user): " github_password
-fi
-echo
-
 ########################################
 ## 1. Verify $stan_directroy is clean and
 ##    up to date
@@ -195,20 +157,11 @@ pushd $stan_directory > /dev/null
 git submodule init
 git submodule update --recursive
 
-old_math_dir=$(find lib -name stan_math*)
-if [[ $old_math_dir != lib/stan_math_$math_version ]]; then
-  git mv $old_math_dir lib/stan_math_$math_version
-  sed -i '' 's|\(.*\)'$old_math_dir'\(.*\)$|\1lib/stan_math_'$math_version'\2|g' makefile
-  git add makefile
-fi
-
-pushd lib/stan_math_$math_version > /dev/null
-
+pushd lib/stan_math > /dev/null
 git checkout v$math_version
-
 popd > /dev/null
 
-git add lib/stan_math_$math_version
+git add lib/stan_math
 git commit -m "Updating Math Library to tagged v$math_version" || echo "Math Library already at v$math_version"
 
 popd > /dev/null
@@ -255,32 +208,6 @@ git commit -m "release/v$version: updating version numbers." -a
 
 popd > /dev/null
 
-
-########################################
-## 6. Build documentation
-########################################
-print_step 6
-_msg="Building documentation"
-pushd $stan_directory > /dev/null
-
-make manual doxygen > /dev/null
-
-popd > /dev/null
-
-
-########################################
-## 7. Git add and commit built documentation
-########################################
-print_step 7
-_msg="Committing built documentation"
-pushd $stan_directory > /dev/null
-
-git add -f doc
-git commit -m "release/v$version: adding built documentation."
-
-popd > /dev/null
-
-
 ########################################
 ## 8. Final test. Git push
 ########################################
@@ -295,35 +222,19 @@ git push origin release/v$version
 
 popd > /dev/null
 
-
-
 ########################################
-## 9. Create github pull request
+## 8. Merge into develop
 ########################################
-print_step 9
-_msg="Create github pull request for $version"
+print_step 8
+_msg="Merging into develop"
 pushd $stan_directory > /dev/null
 
+wait_for_input "Ready to merge into develop"
 
-wait_for_input "Creating the pull request "
-
-create_pull_request "release/v$version" "release/v$version" "develop" "#### Summary:\n\nUpdates version numbers to v$version.\n\n#### Intended Effect:\n\nThe \`develop\` branch should be tagged as \`v$version\` after this is merged.\n\n#### How to Verify:\n\nInspect the code.\n\n#### Side Effects:\n\nNone.\n\n#### Documentation:\n\nDocumentation is included.\n\n#### Reviewer Suggestions: \n\nNone."
-
-popd > /dev/null
-
-
-########################################
-## 10. Merge github pull request
-########################################
-print_step 10
-_msg="Merging pull request $github_number"
-pushd $stan_directory > /dev/null
-
-wait_for_input "Merging the pull request "
-
-merge_pull_request $github_number "release/v$version"
 git checkout develop
-git pull --ff
+git pull origin develop
+git merge release/v$version
+git push origin develop
 git branch -d release/v$version
 
 popd > /dev/null
@@ -337,7 +248,7 @@ _msg="tagging version v$version"
 pushd $stan_directory > /dev/null
 
 git checkout develop
-git pull --ff
+git pull origin develop --ff
 git tag -a "v$version" -m "Tagging v$version"
 git push origin "v$version"
 
@@ -359,80 +270,15 @@ git push origin master
 popd > /dev/null
 
 ########################################
-## 13. Package version to upload
+## 13. Build documentation
 ########################################
 print_step 13
-_msg="Creating a zip file for uploading"
+_msg="Building documentation"
 pushd $stan_directory > /dev/null
 
-git pull --ff
-git checkout v$version
+make manual > /dev/null
 
-popd > /dev/null
-
-
-########################################
-## 14. Create GitHub issue to remove documentation
-##     and move math version
-########################################
-print_step 14
-_msg="Create github issue for removing v$version documentation and moving math version"
-pushd $stan_directory > /dev/null
-
-create_issue "Remove v$version documentation and move math library" "Remove build documentation from repository and move math library back to lib/stan_math."
-
-popd > /dev/null
-
-########################################
-## 15. Create git branch to remove documentation
-##     remove and commit.
-########################################
-print_step 15
-_msg="Creating branch to remove documentation and move math version"
-pushd $stan_directory > /dev/null
-
-git checkout develop
-git pull --ff
-git checkout -b feature/issue-$github_number-remove-documentation-move-math
-git rm -rf doc
-git commit -m "Removing built documentation."
-
-git mv lib/stan_math_$math_version lib/stan_math
-sed -i '' 's|\(.*\)lib/stan_math_'$math_version'\(.*\)|\1'$old_math_dir'\2|g' makefile
-git add makefile
-
-pushd lib/stan_math > /dev/null
-git checkout develop
-git pull --ff
-popd > /dev/null
-
-git commit -m "fixes #$github_number. moving math library back to lib/stan_math"
-
-git push origin feature/issue-$github_number-remove-documentation-move-math
-
-popd > /dev/null
-
-########################################
-## 16. Create GitHub pull request to remove documentation
-########################################
-print_step 16
-_msg="Pull request to remove documentation"
-pushd $stan_directory > /dev/null
-
-create_pull_request "Remove v$version documentation and move math library" "feature/issue-$github_number-remove-documentation-move-math" "develop" "#### Summary:\n\nRemoves built documentation and moves math library.\n\n#### Intended Effect:\n\nRemoves built documentation included as part of the \`v$version\` tag; also moves the math library\n\n#### How to Verify:\n\nInspect.\n\n#### Side Effects:\n\nNone.\n\n#### Documentation:\n\nNone.\n\n#### Reviewer Suggestions: \n\nNone."
-
-popd > /dev/null
-
-
-
-########################################
-## 17. Merge GitHub pull request to remove documentation
-########################################
-print_step 17
-_msg="Pull request to remove documentation"
-pushd $stan_directory > /dev/null
-
-merge_pull_request $github_number "feature/issue-$github_number-remove-documentation"
+echo "Now, upload the manual to github."
 
 popd > /dev/null
 

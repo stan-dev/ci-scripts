@@ -10,8 +10,6 @@ set -e -u
 math_directory=
 old_version=
 version=
-github_user=
-github_password=
 
 
 ## internal variables
@@ -23,31 +21,11 @@ _steps[1]="Verify Stan Math Library is clean and up to date"
 _steps[2]="Create release branch using git."
 _steps[3]="Replace uses of old version number with new version number."
 _steps[4]="Git add and commit changed files."
-_steps[5]="Build documentation."
-_steps[6]="Git add and commit build documentation."
 _steps[7]="Test build. Git push."
-_steps[8]="Create GitHub pull request."
-_steps[9]="Merge GitHub pull request."
+_steps[8]="Merging into develop."
 _steps[10]="Git tag version."
 _steps[11]="Update master branch to new version"
-_steps[12]="Create GitHub issue to remove documentation."
-_steps[13]="Create git branch to remove documentation"
-_steps[14]="Create GitHub pull request to remove documentation."
-_steps[15]="Merge GitHub pull request to remove documentation."
 
-echo ""
-echo "---------- Script to Tag Stan Math Library ----------"
-echo ""
-echo "  Steps in this script:"
-for ((n = 0; n < ${#_steps[@]}; n++))
-do
-  if [[ $n -lt 10 ]]; then
-    echo "     "$n: ${_steps[$n]}
-  else
-    echo "    "$n: ${_steps[$n]}
-  fi
-done
-echo ""
 
 ########################################
 ## 0: Set up variables
@@ -127,19 +105,6 @@ if [[ $old_version == $version ]]; then
   exit 1
 fi
 
-## read GitHub user name
-_msg="Reading GitHub user name"
-if [[ -z $github_user ]]; then
-  read -p "  Github user name: " github_user
-fi
-
-## read GitHub password
-_msg="Reading Github password"
-if [[ -z $github_password ]]; then
-  read -s -p "  Github password (user: $github_user): " github_password
-fi
-echo
-
 ########################################
 ## 1. Verify $math_directory is clean and
 ##    up to date
@@ -155,7 +120,7 @@ if [[ -n $(git status --porcelain) ]]; then
 fi
 
 git checkout develop
-git pull --ff
+git pull origin develop --ff
 
 popd > /dev/null
 
@@ -214,32 +179,6 @@ git commit -m "release/v$version: updating version numbers" -a
 
 popd > /dev/null
 
-
-########################################
-## 5. Build documentation
-########################################
-print_step 5
-_msg="Building documentation"
-pushd $math_directory > /dev/null
-
-make doxygen > /dev/null
-
-popd > /dev/null
-
-
-########################################
-## 6. Git add and commit built documentation
-########################################
-print_step 6
-_msg="Committing built documentation"
-pushd $math_directory > /dev/null
-
-git add -f doc
-git commit -m "release/v$version: adding built documentation. [skip ci]"
-
-popd > /dev/null
-
-
 ########################################
 ## 7. Final test. Git push
 ########################################
@@ -254,35 +193,20 @@ git push origin release/v$version
 
 popd > /dev/null
 
-
-
 ########################################
-## 8. Create github pull request
+## 8. Merge into develop
 ########################################
 print_step 8
-_msg="Create github pull request for $version"
+_msg="Merging into develop"
 pushd $math_directory > /dev/null
 
+wait_for_input "Ready to merge into develop"
 
-wait_for_input "Creating the pull request "
-
-create_pull_request "release/v$version" "release/v$version" "develop" "#### Summary:\n\nUpdates version numbers to v$version.\n\n#### Intended Effect:\n\nThe \`develop\` branch should be tagged as \`v$version\` after this is merged.\n\n#### How to Verify:\n\nInspect the code.\n\n#### Side Effects:\n\nNone.\n\n#### Documentation:\n\nDocumentation is included.\n\n#### Reviewer Suggestions: \n\nNone.\n\n[skip ci]"
-
-popd > /dev/null
-
-
-########################################
-## 9. Merge github pull request
-########################################
-print_step 9
-_msg="Merging pull request $github_number"
-pushd $math_directory > /dev/null
-
-wait_for_input "Merging the pull request "
-
-merge_pull_request $github_number "release/v$version"
+### FIXME: Add testing code here
 git checkout develop
-git pull --ff
+git pull origin develop
+git merge release/v$version
+git push origin develop
 git branch -d release/v$version
 
 popd > /dev/null
@@ -312,58 +236,6 @@ wait_for_input "Updating master to v$version"
 git checkout master
 git reset --hard v$version
 git push origin master
-
-popd > /dev/null
-
-
-########################################
-## 12. Create GitHub issue to remove documentation
-########################################
-print_step 12
-_msg="Create github issue for removing v$version documentation"
-pushd $math_directory > /dev/null
-
-create_issue "Remove v$version documentation" "Remove build documentation from repository."
-
-popd > /dev/null
-
-########################################
-## 13. Create git branch to remove documentation
-##     remove and commit.
-########################################
-print_step 13
-_msg="Creating branch to remove documentation"
-pushd $math_directory > /dev/null
-
-git checkout develop
-git checkout -b feature/issue-$github_number-remove-documentation
-git rm -rf doc
-git commit -m "fixes #$github_number. Removing built documentation. [skip ci]"
-git push origin feature/issue-$github_number-remove-documentation
-
-popd > /dev/null
-
-########################################
-## 14. Create GitHub pull request to remove documentation
-########################################
-print_step 14
-_msg="Pull request to remove documentation"
-pushd $math_directory > /dev/null
-
-create_pull_request "Remove v$version documentation" "feature/issue-$github_number-remove-documentation" "develop" "#### Summary:\n\nRemoves built documentation.\n\n#### Intended Effect:\n\nRemoves built documentation included as part of the \`v$version\` tag.\n\n#### How to Verify:\n\nInspect.\n\n#### Side Effects:\n\nNone.\n\n#### Documentation:\n\nNone.\n\n#### Reviewer Suggestions: \n\nNone.\n\n[skip ci]"
-
-popd > /dev/null
-
-
-
-########################################
-## 15. Merge GitHub pull request to remove documentation
-########################################
-print_step 15
-_msg="Pull request to remove documentation"
-pushd $math_directory > /dev/null
-
-merge_pull_request $github_number "feature/issue-$github_number-remove-documentation"
 
 popd > /dev/null
 
