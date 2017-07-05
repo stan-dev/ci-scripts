@@ -241,8 +241,8 @@ popd > /dev/null
 
 echo "Manual steps:"
 echo "1. Rename ${old_version}++ to $version"
-echo "2. Close $version"
-echo "3. Create new ${version}++ milestone."
+echo "2. Create new ${version}++ milestone."
+echo "3. Close $version and bump open issues to ${version}++"
 
 
 ########################################

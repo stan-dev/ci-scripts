@@ -271,8 +271,8 @@ git-archive-all cmdstan-$version.zip
 echo "Manual steps:"
 echo "0. Upload zip files and manual to github release manually."
 echo "1. Rename ${old_version}++ to $version"
-echo "2. Close $version"
-echo "3. Create new ${version}++ milestone."
+echo "2. Create new ${version}++ milestone."
+echo "3. Close $version and bump open issues to ${version}++"
 
 popd > /dev/null
 
