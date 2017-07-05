@@ -239,6 +239,11 @@ git push origin master
 
 popd > /dev/null
 
+echo "Manual steps:"
+echo "1. Rename ${old_version}++ to $version"
+echo "2. Close $version"
+echo "3. Create new ${version}++ milestone."
+
 
 ########################################
 ## Done

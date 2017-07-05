@@ -278,7 +278,11 @@ pushd $stan_directory > /dev/null
 
 make manual > /dev/null
 
-echo "Now, upload the manual to github."
+echo "Manual steps:"
+echo "0. Upload the manual to github"
+echo "1. Rename ${old_version}++ to $version"
+echo "2. Close $version"
+echo "3. Create new ${version}++ milestone."
 
 popd > /dev/null
 

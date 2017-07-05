@@ -268,7 +268,11 @@ git-archive-all cmdstan-$version.tar.gz
 echo "Creating archive: cmdstan-$version.zip"
 git-archive-all cmdstan-$version.zip
 
-echo "Upload zip files and manual to github release manually."
+echo "Manual steps:"
+echo "0. Upload zip files and manual to github release manually."
+echo "1. Rename ${old_version}++ to $version"
+echo "2. Close $version"
+echo "3. Create new ${version}++ milestone."
 
 popd > /dev/null
 
