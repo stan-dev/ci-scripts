@@ -8,9 +8,9 @@ set -e -u
 
 ## define variables
 cmdstan_directory=~/scm/release/cmdstan
-old_version=2.15.0
-version=2.16.0
-stan_version=2.16.0
+old_version=
+version=
+stan_version=
 
 
 # ## internal variables
@@ -27,157 +27,157 @@ _steps[8]="Merge into develop."
 _steps[9]="Git tag version."
 _steps[10]="Update master branch to new version"
 _steps[11]="Create a zip file to upload"
-# 
-# 
-# ########################################
-# ## 0: Set up variables
-# ########################################
-# print_step 0
-# _msg="Input CmdStan directory"
-# if [[ -z $cmdstan_directory ]]; then
-#   read -p "  Input CmdStan directory: " cmdstan_directory
-#   eval cmdstan_directory=$cmdstan_directory
-# fi
-# 
-# ## validate cmdstan_directory
-# _msg="Validating CmdStan directory: $cmdstan_directory"
-# if [[ ! -d $cmdstan_directory ]]; then
-#   _msg="Cloning CmdStan into $cmdstan_directory"
-#   echo ""
-#   eval "git clone $tag_github_url $cmdstan_directory"
-#   echo ""
-# fi
-# 
-# pushd $cmdstan_directory > /dev/null
-# _msg="Verifying CmdStan in $cmdstan_directory is correct"
-# 
-# if [[ $(git ls-remote --get-url origin) != $tag_github_url ]]; then
-#   _msg="Wrong repository!
-#     $cmdstan_directory is cloned from $(git ls-remote --get-url origin)
-#     Expecting a clone of $tag_github_url"
-#   exit 1
-# fi
-# popd > /dev/null
-# 
-# ## reading current CmdStan version
-# _msg="Reading current CmdStan version"
-# if [[ -z $old_version ]]; then
-#   tmp=$(read_cmdstan_version)
-#   read -p "  Current CmdStan version (leave blank for: $tmp): " old_version
-#   if [[ -z $old_version ]]; then
-#     old_version=$tmp
-#   fi
-# fi
-# 
-# _msg="Verifying old version matches the repository version"
-# if ! check_version $old_version; then
-#   _msg="Invalid old version: \"$old_version\""
-#   exit 1
-# fi
-# if [[ $(read_cmdstan_version) != $old_version ]]; then
-#   _msg="Invalid old CmdStan version: \"$old_version\"
-#     Expecting version: \"$(read_cmdstan_version)\""
-#   exit 1
-# fi
-# 
-# ## reading new CmdStan version
-# _msg="Reading new CmdStan version"
-# if [[ -z $version ]]; then
-#   read -p "  New CmdStan version (old version: $old_version): " version
-# fi
-# 
-# _msg="Verifying new CmdStan version"
-# if ! check_version $version; then
-#   _msg="Invalid new version: \"$version\""
-#   exit 1
-# fi
-# if [[ $old_version == $version ]]; then
-#   _msg="Invalid new version!
-#     Trying to tag the same version: \"$version\""
-#   exit 1
-# fi
-# 
-# 
-# ## reading Stan version
-# _msg="Reading Stan version"
-# if [[ -z $stan_version ]]; then
-#   read -p "  Stan version (default: $version): " stan_version
-#   if [[ -z $stan_version ]]; then
-#     stan_version=$version
-#   fi
-# fi
-# 
-# ########################################
-# ## 1. Verify $cmdstan_directory is clean and
-# ##    up to date
-# ########################################
-# print_step 1
-# _msg="Checking $cmdstan_directory"
-# pushd $cmdstan_directory > /dev/null
-# 
-# if [[ -n $(git status --porcelain) ]]; then
-#   _msg="$cmdstan_directory is not clean!
-#     Verify the directory passes \"git status --porcelain\""
-#   exit 1
-# fi
-# 
-# git checkout develop
-# git pull --ff
-# 
-# popd > /dev/null
-# 
-# 
-# ########################################
-# ## 2. Create release branch using git.
-# ##    release/v$version
-# ########################################
-# print_step 2
-# _msg="Creating release/v$version branch"
-# pushd $cmdstan_directory > /dev/null
-# 
-# git checkout -b release/v$version
-# 
-# popd > /dev/null
-# 
-# ########################################
-# ## 3. Update Stan to tagged version
-# ########################################
-# print_step 3
-# _msg="Updating Stan to tag v$stan_version."
-# pushd $cmdstan_directory > /dev/null
-# 
-# git submodule init
-# git submodule update
-# 
-# pushd stan > /dev/null
-# 
-# git checkout v$stan_version
-# 
-# git submodule init
-# git submodule update
-# 
-# popd > /dev/null
-# 
-# math_version=$(grep stan_math stan | sed 's|\(.*\)stan_math\(.*\)/|\2|g')
-# 
-# git add stan
-# git commit -m "Updating Stan to tagged v$version"  || echo "Stan already at v$stan_version"
-# 
-# popd > /dev/null
-# 
-# 
-# ########################################
-# ## 4. Update version numbers
-# ########################################
-# print_step 4
-# _msg="Updating version numbers"
-# pushd $cmdstan_directory > /dev/null
-# 
-# replace_version $(grep -rlF "$old_version" src make makefile)
-# replace_version .github/ISSUE_TEMPLATE.md
-# git commit -m "release/v$version: updating version numbers" -a
-# 
-# popd > /dev/null
+
+
+########################################
+## 0: Set up variables
+########################################
+print_step 0
+_msg="Input CmdStan directory"
+if [[ -z $cmdstan_directory ]]; then
+  read -p "  Input CmdStan directory: " cmdstan_directory
+  eval cmdstan_directory=$cmdstan_directory
+fi
+
+## validate cmdstan_directory
+_msg="Validating CmdStan directory: $cmdstan_directory"
+if [[ ! -d $cmdstan_directory ]]; then
+  _msg="Cloning CmdStan into $cmdstan_directory"
+  echo ""
+  eval "git clone $tag_github_url $cmdstan_directory"
+  echo ""
+fi
+
+pushd $cmdstan_directory > /dev/null
+_msg="Verifying CmdStan in $cmdstan_directory is correct"
+
+if [[ $(git ls-remote --get-url origin) != $tag_github_url ]]; then
+  _msg="Wrong repository!
+    $cmdstan_directory is cloned from $(git ls-remote --get-url origin)
+    Expecting a clone of $tag_github_url"
+  exit 1
+fi
+popd > /dev/null
+
+## reading current CmdStan version
+_msg="Reading current CmdStan version"
+if [[ -z $old_version ]]; then
+  tmp=$(read_cmdstan_version)
+  read -p "  Current CmdStan version (leave blank for: $tmp): " old_version
+  if [[ -z $old_version ]]; then
+    old_version=$tmp
+  fi
+fi
+
+_msg="Verifying old version matches the repository version"
+if ! check_version $old_version; then
+  _msg="Invalid old version: \"$old_version\""
+  exit 1
+fi
+if [[ $(read_cmdstan_version) != $old_version ]]; then
+  _msg="Invalid old CmdStan version: \"$old_version\"
+    Expecting version: \"$(read_cmdstan_version)\""
+  exit 1
+fi
+
+## reading new CmdStan version
+_msg="Reading new CmdStan version"
+if [[ -z $version ]]; then
+  read -p "  New CmdStan version (old version: $old_version): " version
+fi
+
+_msg="Verifying new CmdStan version"
+if ! check_version $version; then
+  _msg="Invalid new version: \"$version\""
+  exit 1
+fi
+if [[ $old_version == $version ]]; then
+  _msg="Invalid new version!
+    Trying to tag the same version: \"$version\""
+  exit 1
+fi
+
+
+## reading Stan version
+_msg="Reading Stan version"
+if [[ -z $stan_version ]]; then
+  read -p "  Stan version (default: $version): " stan_version
+  if [[ -z $stan_version ]]; then
+    stan_version=$version
+  fi
+fi
+
+########################################
+## 1. Verify $cmdstan_directory is clean and
+##    up to date
+########################################
+print_step 1
+_msg="Checking $cmdstan_directory"
+pushd $cmdstan_directory > /dev/null
+
+if [[ -n $(git status --porcelain) ]]; then
+  _msg="$cmdstan_directory is not clean!
+    Verify the directory passes \"git status --porcelain\""
+  exit 1
+fi
+
+git checkout develop
+git pull --ff
+
+popd > /dev/null
+
+
+########################################
+## 2. Create release branch using git.
+##    release/v$version
+########################################
+print_step 2
+_msg="Creating release/v$version branch"
+pushd $cmdstan_directory > /dev/null
+
+git checkout -b release/v$version
+
+popd > /dev/null
+
+########################################
+## 3. Update Stan to tagged version
+########################################
+print_step 3
+_msg="Updating Stan to tag v$stan_version."
+pushd $cmdstan_directory > /dev/null
+
+git submodule init
+git submodule update
+
+pushd stan > /dev/null
+
+git checkout v$stan_version
+
+git submodule init
+git submodule update
+
+popd > /dev/null
+
+math_version=$(grep stan_math stan | sed 's|\(.*\)stan_math\(.*\)/|\2|g')
+
+git add stan
+git commit -m "Updating Stan to tagged v$version"  || echo "Stan already at v$stan_version"
+
+popd > /dev/null
+
+
+########################################
+## 4. Update version numbers
+########################################
+print_step 4
+_msg="Updating version numbers"
+pushd $cmdstan_directory > /dev/null
+
+replace_version $(grep -rlF "$old_version" src make makefile)
+replace_version .github/ISSUE_TEMPLATE.md
+git commit -m "release/v$version: updating version numbers" -a
+
+popd > /dev/null
 
 
 ########################################
