@@ -122,6 +122,8 @@ print_step 1
 _msg="Checking $stan_directory"
 pushd $stan_directory > /dev/null
 
+git submodule update --init --recursive
+
 if [[ -n $(git status --porcelain) ]]; then
   _msg="$stan_directory is not clean!
     Verify the directory passes \"git status --porcelain\""
@@ -154,10 +156,8 @@ print_step 3
 _msg="Updating Stan Math Library to v$math_version"
 pushd $stan_directory > /dev/null
 
-git submodule init
-git submodule update --recursive
-
 pushd lib/stan_math > /dev/null
+git fetch
 git checkout v$math_version
 popd > /dev/null
 
