@@ -7,7 +7,7 @@ trap 'abort' 0
 set -e -u
 
 ## define variables
-math_directory=
+math_directory=~/scm/release/math/
 old_version=
 version=
 
@@ -243,6 +243,7 @@ echo "Manual steps:"
 echo "1. Rename ${old_version}++ to $version"
 echo "2. Create new ${version}++ milestone."
 echo "3. Close $version and bump open issues to ${version}++"
+echo "4. Create new release https://github.com/stan-dev/math/releases"
 
 
 ########################################

@@ -7,7 +7,7 @@ trap 'abort' 0
 set -e -u
 
 ## define variables
-stan_directory=
+stan_directory=~/scm/release/stan
 old_version=
 version=
 math_version=
