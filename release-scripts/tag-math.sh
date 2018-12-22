@@ -7,9 +7,10 @@ trap 'abort' 0
 set -e -u
 
 ## define variables
-math_directory=~/scm/release/math/
+math_directory=
 old_version=
 version=
+branch_to_release=develop
 
 
 ## internal variables
@@ -38,6 +39,7 @@ if [[ -z $math_directory ]]; then
 fi
 
 ## validate math_directory
+[ -z "$math_directory" ] && math_directory=math
 _msg="Validating Stan Math Library directory: $math_directory"
 if [[ ! -d $math_directory ]]; then
   _msg="Cloning Stan Math Library into $math_directory"
@@ -119,8 +121,8 @@ if [[ -n $(git status --porcelain) ]]; then
   exit 1
 fi
 
-git checkout develop
-git pull origin develop --ff
+git checkout $branch_to_release
+git pull origin $branch_to_release --ff
 
 popd > /dev/null
 
@@ -143,7 +145,6 @@ popd > /dev/null
 ########################################
 print_step 3
 _msg="Updating version numbers"
-pushd $math_directory > /dev/null
 
 ## stan/math/version.hpp
 _msg="Updating version numbers: ${math_directory}/stan/math/version.hpp"
@@ -160,11 +161,9 @@ fi
 
 replace_version $(grep -rlF --exclude={*.hpp,*.cpp} "$old_version" ${math_directory}/stan)
 replace_version $(grep -rlF --exclude={*.hpp,*.cpp} "$old_version" ${math_directory}/doxygen)
-replace_version .github/ISSUE_TEMPLATE.md
+replace_version ${math_directory}/.github/ISSUE_TEMPLATE.md
 
 wait_for_input "Go ahead and edit RELEASE_NOTES.txt now."
-
-popd > /dev/null
 
 
 ########################################
