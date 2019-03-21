@@ -7,7 +7,7 @@ trap 'abort' 0
 set -e -u
 
 ## define variables
-stan_directory=~/scm/release/stan
+stan_directory=
 old_version=
 version=
 math_version=
@@ -25,7 +25,6 @@ _steps[5]="Git add and commit changed files."
 _steps[8]="Test build. Git push."
 _steps[11]="Git tag version."
 _steps[12]="Update master branch to new version"
-_steps[13]="Build manual. Manual upload of manual."
 
 ########################################
 ## 0: Set up variables
@@ -39,6 +38,7 @@ fi
 
 ## validate stan_directory
 _msg="Validating Stan directory: $stan_directory"
+[ -z "$stan_directory" ] && stan_directory=$(realpath stan)
 if [[ ! -d $stan_directory ]]; then
   _msg="Cloning Stan into $stan_directory"
   echo ""
@@ -269,22 +269,11 @@ git push origin master
 
 popd > /dev/null
 
-########################################
-## 13. Build documentation
-########################################
-print_step 13
-_msg="Building documentation"
-pushd $stan_directory > /dev/null
-
-make manual > /dev/null
-
 echo "Manual steps:"
-echo "0. Upload the manual to github"
+echo "0. Upload the manual to github, or file issue on docs repo https://github.com/stan-dev/docs/issues"
 echo "1. Rename ${old_version}++ to $version"
 echo "2. Create new ${version}++ milestone."
 echo "3. Close $version and bump open issues to ${version}++"
-
-popd > /dev/null
 
 
 ########################################

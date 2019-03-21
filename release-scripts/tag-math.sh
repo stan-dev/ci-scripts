@@ -39,7 +39,7 @@ if [[ -z $math_directory ]]; then
 fi
 
 ## validate math_directory
-[ -z "$math_directory" ] && math_directory=math
+[ -z "$math_directory" ] && math_directory=$(realpath math)
 _msg="Validating Stan Math Library directory: $math_directory"
 if [[ ! -d $math_directory ]]; then
   _msg="Cloning Stan Math Library into $math_directory"
@@ -232,6 +232,7 @@ pushd $math_directory > /dev/null
 
 wait_for_input "Updating master to v$version"
 
+# XXX ? change to git branch -f master v$version
 git checkout master
 git reset --hard v$version
 git push origin master

@@ -7,7 +7,7 @@ trap 'abort' 0
 set -e -u
 
 ## define variables
-cmdstan_directory=~/scm/release/cmdstan
+cmdstan_directory=
 old_version=
 version=
 stan_version=
@@ -41,6 +41,7 @@ fi
 
 ## validate cmdstan_directory
 _msg="Validating CmdStan directory: $cmdstan_directory"
+[ -z "$cmdstan_directory" ] && cmdstan_directory=$(realpath cmdstan)
 if [[ ! -d $cmdstan_directory ]]; then
   _msg="Cloning CmdStan into $cmdstan_directory"
   echo ""
@@ -265,8 +266,8 @@ git pull --ff
 git checkout v$version
 echo "Creating archive: cmdstan-$version.tar.gz"
 git-archive-all cmdstan-$version.tar.gz
-echo "Creating archive: cmdstan-$version.zip"
-git-archive-all cmdstan-$version.zip
+#echo "Creating archive: cmdstan-$version.zip"
+#git-archive-all cmdstan-$version.zip
 
 echo "Manual steps:"
 echo "0. Upload zip files and manual to github release manually."
