@@ -21,7 +21,7 @@ print_step() {
   _step=$1
   echo "------------------------------------"
   echo "Step "$_step: ${_steps[$_step]}
-  echo 
+  echo
 }
 
 ## read major version from the Stan directory
@@ -81,32 +81,32 @@ patch_version() {
 
 ## replaces the major version in the Stan directory
 replace_stan_major_version() {
-  sed -i '' "s/\(^.*#define STAN_MAJOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(major_version $1)/g" $stan_directory/src/stan/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_MAJOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(major_version $1)/g" $stan_directory/src/stan/version.hpp
 }
 
 ## replaces the minor version in the Stan directory
 replace_stan_minor_version() {
-  sed -i '' "s/\(^.*#define STAN_MINOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(minor_version $1)/g" $stan_directory/src/stan/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_MINOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(minor_version $1)/g" $stan_directory/src/stan/version.hpp
 }
 
 ## replaces the patch version in the Stan directory
 replace_stan_patch_version() {
-  sed -i '' "s/\(^.*#define STAN_PATCH[[:space:]]*\)\([[:alnum:]]*\)/\1$(patch_version $1)/g" $stan_directory/src/stan/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_PATCH[[:space:]]*\)\([[:alnum:]]*\)/\1$(patch_version $1)/g" $stan_directory/src/stan/version.hpp
 }
 
 ## replaces the major version in the Stan directory
 replace_math_major_version() {
-  sed -i '' "s/\(^.*#define STAN_MATH_MAJOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(major_version $1)/g" $math_directory/stan/math/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_MATH_MAJOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(major_version $1)/g" $math_directory/stan/math/version.hpp
 }
 
 ## replaces the minor version in the Stan directory
 replace_math_minor_version() {
-  sed -i '' "s/\(^.*#define STAN_MATH_MINOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(minor_version $1)/g" $math_directory/stan/math/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_MATH_MINOR[[:space:]]*\)\([[:alnum:]]*\).*/\1$(minor_version $1)/g" $math_directory/stan/math/version.hpp
 }
 
 ## replaces the patch version in the Stan directory
 replace_math_patch_version() {
-  sed -i '' "s/\(^.*#define STAN_MATH_PATCH[[:space:]]*\)\([[:alnum:]]*\)/\1$(patch_version $1)/g" $math_directory/stan/math/version.hpp 
+  sed -i '' "s/\(^.*#define STAN_MATH_PATCH[[:space:]]*\)\([[:alnum:]]*\)/\1$(patch_version $1)/g" $math_directory/stan/math/version.hpp
 }
 
 ## replaces the version in all source files in the Stan directory
@@ -123,7 +123,7 @@ replace_version_test() {
   sed -i '' "s/\(^.*EXPECT_EQ(\)\(.*\)\(, STAN_PATCH);.*\)/\1$(patch_version $version)\3/g" src/test/unit/version_test.cpp
   sed -i '' "s/\(^.*EXPECT_EQ(\"\)\(.*\)\(\", stan::MAJOR_VERSION);.*\)/\1$(major_version $version)\3/g" src/test/unit/version_test.cpp
   sed -i '' "s/\(^.*EXPECT_EQ(\"\)\(.*\)\(\", stan::MINOR_VERSION);.*\)/\1$(minor_version $version)\3/g" src/test/unit/version_test.cpp
-  sed -i '' "s/\(^.*EXPECT_EQ(\"\)\(.*\)\(\", stan::PATCH_VERSION);.*\)/\1$(patch_version $version)\3/g" src/test/unit/version_test.cpp  
+  sed -i '' "s/\(^.*EXPECT_EQ(\"\)\(.*\)\(\", stan::PATCH_VERSION);.*\)/\1$(patch_version $version)\3/g" src/test/unit/version_test.cpp
 }
 
 
@@ -242,7 +242,11 @@ $response
 
 wait_for_input() {
   input=
-  until [ "$input" = "y" ]; do 
+  until [ "$input" = "y" ]; do
     read -p "$1 (Press 'y' to continue): " input
   done
+}
+
+realpath() {
+    python -c "import os; print(os.path.abspath('$1'))"
 }
