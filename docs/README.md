@@ -24,7 +24,12 @@ Stan is a CmdStan submodule. It's located at `./stan`.
 
 # Build agents
 
-See [agents](agents.md) for more detail about our agents and their spefications.
+See [agents](agents.md) for more detail about our agents and their spefications. We currently have:
+ - 2x MacOS 
+ - 2x Windows
+ - 2x Linux
+ - On-Demand EC2 instances for Linux
+ - On-Demand EC2 instances for Windows
         
 # Current jobs
 
