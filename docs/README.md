@@ -5,10 +5,10 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 
 These are the repositories tested/automated using Jenkins:
 
-- [Math](github.com/stan-dev/math)
-- [Stan](github.com/stan-dev/stan)
-- [CmdStan](github.com/stan-dev/cmdstan)
-- [Stanc3](github.com/stan-dev/stanc3)
+- [Math](https://github.com/stan-dev/math)
+- [Stan](https://github.com/stan-dev/stan)
+- [CmdStan](https://github.com/stan-dev/cmdstan)
+- [Stanc3](https://github.com/stan-dev/stanc3)
 - [Docs](https://github.com/stan-dev/docs)
 
 There is also a dependency between the repos managed by git submodules:
