@@ -75,3 +75,40 @@ Parameters:
 - `downstream_tests` - PR to test CmdStan upstream against (Example: PR-123)
 
 Checkout the [README](jobs/stan.md) for more technical details.
+
+## CmdStan Performance Tests
+
+### History
+
+- Master history can be found [here](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests/job/master/)
+- Custom history can be found [here](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests/job/Custom/)
+- Downstream_tests history can be found [here](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests/job/downstream_tests/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [CmdStan Performance Tests](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests)
+
+Parameters:  
+
+- `cmdstan_pr` - CmdStan PR (Example: PR-123) which will be tested against develop
+- `stan_pr` - Stan PR (Example: PR-123)
+- `math_pr` - Math PR (Example: PR-123)
+
+Checkout the [README](jobs/cmdstan-performance-tests.md) for more technical details.
+
+## Build Docs
+
+### History
+
+- Master history can be found [here](https://jenkins.mc-stan.org/job/BuildDocs/job/master/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [Stan](https://jenkins.mc-stan.org/job/BuildDocs)
+
+Parameters:  
+
+- `major_version` - Major version of the docs to be built
+- `minor_version` - Minor version of the docs to be built
+
+Checkout the [README](jobs/build-docs.md) for more technical details.
