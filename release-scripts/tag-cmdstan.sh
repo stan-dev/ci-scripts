@@ -174,7 +174,7 @@ print_step 4
 _msg="Updating version numbers"
 pushd $cmdstan_directory > /dev/null
 
-sed -i 's/nightly/'$version'/g' make/stanc
+sed -i '' 's/nightly/'$version'/g' make/stanc
 replace_version $(grep -rlF "$old_version" src make makefile)
 replace_version .github/ISSUE_TEMPLATE.md
 git commit -m "release/v$version: updating version numbers" -a
