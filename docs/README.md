@@ -1,7 +1,18 @@
 For a tutorial on interacting with the current Jenkins jobs, please see this discourse post:
 http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 
-# GitHub repos
+# Contents
+
+1. [Github repositories](#repositories)
+2. [Agents](#agents)
+3. [Jobs](#jobs)
+3.1 [Math](#math)
+3.2 [Stan](#stan)
+3.3 [CmdStan Performance Tests](#cmdstan-performance-tests)
+3.4 [Build Docs](#build-docs)
+4. [How To](#how-to)
+
+# Repositories
 
 These are the repositories tested/automated using Jenkins:
 
@@ -22,7 +33,7 @@ Stan is a CmdStan submodule. It's located at `./stan`.
   
 [Jenkins shared libraries](https://github.com/stan-dev/jenkins-shared-libraries) - This is code used across Jenkins projects, as a package so we don't repeat ourselves.
 
-# Build agents
+# Agents
 
 See [agents](agents.md) for more detail about our agents and their spefications. We currently have:
  - 2x MacOS 
@@ -31,7 +42,7 @@ See [agents](agents.md) for more detail about our agents and their spefications.
  - On-Demand EC2 instances for Linux
  - On-Demand EC2 instances for Windows
         
-# Current jobs
+# Jobs
 
 We test each pull request for the repositories, soon we will ignore PRs that do not modify the source code to speedup build times and save resources.
 We also test every time a merge happens into the `develop` branch.   
@@ -112,3 +123,9 @@ Parameters:
 - `minor_version` - Minor version of the docs to be built
 
 Checkout the [README](jobs/build-docs.md) for more technical details.
+
+# How To
+
+### Check on which machine a job ran
+
+### Extract job logs for debugging
