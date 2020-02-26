@@ -6,10 +6,10 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 1. [Github repositories](#repositories)
 2. [Agents](#agents)
 3. [Jobs](#jobs)
-- [Math](#math)
-- [Stan](#stan)
-- [CmdStan Performance Tests](#cmdstan-performance-tests)
-- [Build Docs](#build-docs)
+   - [Math](#math)
+   - [Stan](#stan)
+   - [CmdStan Performance Tests](#cmdstan-performance-tests)
+   - [Build Docs](#build-docs)
 1. [How To](#how-to)
 
 # Repositories
