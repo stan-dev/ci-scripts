@@ -55,7 +55,7 @@ See [agents](agents.md) for more detail about our agents and their spefications.
         
 # Jobs
 
-We test each pull request for the repositories, soon we will ignore PRs that do not modify the source code to speedup build times and save resources.
+We test each pull request for the repositories, ignoring the ones that do not touch the source code. To check what considered source code, please check each project [Jenkinsfile](https://github.com/stan-dev/cmdstan/blob/develop/Jenkinsfile#L30)  
 We also test every time a merge happens into the `develop` branch.   
 Why do we do both? Honestly -- weird stuff happens sometimes and even a merge that seems safe ends up breaking the `develop` branch. (It hasn't happened in a while, but it has happened.) I'd just rather know when that happens.  
 
