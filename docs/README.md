@@ -3,14 +3,25 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 
 # Contents
 
-1. [Github repositories](#repositories)
-2. [Agents](#agents)
-3. [Jobs](#jobs)
-   - [Math](#math)
-   - [Stan](#stan)
-   - [CmdStan Performance Tests](#cmdstan-performance-tests)
-   - [Build Docs](#build-docs)
-1. [How To](#how-to)
+- [Contents](#contents)
+- [Repositories](#repositories)
+- [Agents](#agents)
+- [Jobs](#jobs)
+  - [Math](#math)
+    - [History](#history)
+    - [Jenkinsfile](#jenkinsfile)
+  - [Stan](#stan)
+    - [History](#history-1)
+    - [Jenkinsfile](#jenkinsfile-1)
+  - [CmdStan Performance Tests](#cmdstan-performance-tests)
+    - [History](#history-2)
+    - [Jenkinsfile](#jenkinsfile-2)
+  - [Build Docs](#build-docs)
+    - [History](#history-3)
+    - [Jenkinsfile](#jenkinsfile-3)
+- [How To](#how-to)
+    - [Extract job logs for debugging](#extract-job-logs-for-debugging)
+    - [Check on which machine a job ran](#check-on-which-machine-a-job-ran)
 
 # Repositories
 
@@ -126,6 +137,18 @@ Checkout the [README](jobs/build-docs.md) for more technical details.
 
 # How To
 
+### Extract job logs for debugging
+
+Sometimes you need to get all the logs from a job to debug an issue or look for clues. Doing this through a browser is very slow and painful.  
+Let's take as example this [job](https://jenkins.mc-stan.org/job/CmdStan/job/develop/598/) where its url is `https://jenkins.mc-stan.org/job/CmdStan/job/develop/598`.  
+
+To download the entire log all we need to do is append `/consoleText` to the url and then use `wget`. Example:  
+`wget https://jenkins.mc-stan.org/job/CmdStan/job/develop/598/consoleText`  
+
+For windows just browse `https://jenkins.mc-stan.org/job/CmdStan/job/develop/598/consoleText` with your browser, right click and save on your machine.
+
 ### Check on which machine a job ran
 
-### Extract job logs for debugging
+To debug on which machine a job ran just follow the above [Extract job logs for debugging](extract-job-logs-for-debugging) to get the entire log.  
+Then simply open it inside an editor ( Ex. Visual Studio Code ) and `CTRL + F` for `Running on`.  
+What you should find looks like: `Running on gelman-group-linux`
