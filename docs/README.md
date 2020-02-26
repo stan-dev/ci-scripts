@@ -149,6 +149,6 @@ For windows just browse `https://jenkins.mc-stan.org/job/CmdStan/job/develop/598
 
 ### Check on which machine a job ran
 
-To debug on which machine a job ran just follow the above [Extract job logs for debugging](extract-job-logs-for-debugging) to get the entire log.  
+To debug on which machine a job ran just follow the above [Extract job logs for debugging](#extract-job-logs-for-debugging) to get the entire log.  
 Then simply open it inside an editor ( Ex. Visual Studio Code ) and `CTRL + F` for `Running on`.  
 What you should find looks like: `Running on gelman-group-linux`
