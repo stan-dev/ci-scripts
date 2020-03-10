@@ -7,18 +7,30 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 - [Repositories](#repositories)
 - [Agents](#agents)
 - [Jobs](#jobs)
-  - [Math](#math)
+  - [CmdStan](#cmdstan)
     - [History](#history)
     - [Jenkinsfile](#jenkinsfile)
-  - [Stan](#stan)
+  - [Math](#math)
     - [History](#history-1)
     - [Jenkinsfile](#jenkinsfile-1)
-  - [CmdStan Performance Tests](#cmdstan-performance-tests)
+  - [Stan](#stan)
     - [History](#history-2)
     - [Jenkinsfile](#jenkinsfile-2)
-  - [Build Docs](#build-docs)
+  - [Stanc3](#stanc3)
     - [History](#history-3)
     - [Jenkinsfile](#jenkinsfile-3)
+  - [CmdStan Performance Tests](#cmdstan-performance-tests)
+    - [History](#history-4)
+    - [Jenkinsfile](#jenkinsfile-4)
+  - [Custom CmdStan Performance Tests](#custom-cmdstan-performance-tests)
+    - [History](#history-5)
+    - [Jenkinsfile](#jenkinsfile-5)
+  - [Daily Stan Performance](#daily-stan-performance)
+    - [History](#history-6)
+    - [Jenkinsfile](#jenkinsfile-6)
+  - [Build Docs](#build-docs)
+    - [History](#history-7)
+    - [Jenkinsfile](#jenkinsfile-7)
 - [How To](#how-to)
     - [Extract job logs for debugging](#extract-job-logs-for-debugging)
     - [Check on which machine a job ran](#check-on-which-machine-a-job-ran)
@@ -59,6 +71,25 @@ We test each pull request for the repositories, ignoring the ones that do not to
 We also test every time a merge happens into the `develop` branch.   
 Why do we do both? Honestly -- weird stuff happens sometimes and even a merge that seems safe ends up breaking the `develop` branch. (It hasn't happened in a while, but it has happened.) I'd just rather know when that happens.  
 
+## CmdStan
+
+### History
+
+- Master history can be found [here](https://jenkins.mc-stan.org/job/CmdStan/job/master/)
+- Develop history can be found [here](https://jenkins.mc-stan.org/job/CmdStan/job/develop/)
+- PRs history can be found [here](https://jenkins.mc-stan.org/job/CmdStan/view/change-requests/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [CmdStan](https://jenkins.mc-stan.org/job/CmdStan/)
+
+Parameters:  
+
+- `stan_pr` - Stan PR (Example: PR-123)
+- `math_pr` - Math PR (Example: PR-123)
+  
+Checkout the [README](jobs/cmdstan.md) for more technical details.  
+
 ## Math
 
 Link to Jenkins project: [Math](https://jenkins.mc-stan.org/job/Math%20Pipeline)
@@ -98,6 +129,21 @@ Parameters:
 
 Checkout the [README](jobs/stan.md) for more technical details.
 
+## Stanc3
+
+### History
+
+- History can be found [here](https://jenkins.mc-stan.org/job/stanc3/job/master/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [Stanc3](https://jenkins.mc-stan.org/job/stanc3/job/master/)
+Parameters:  
+
+- `compile_all` - Try compiling all models in test/integration/good
+
+Checkout the [README](jobs/stanc3.md) for more technical details.
+
 ## CmdStan Performance Tests
 
 ### History
@@ -117,6 +163,57 @@ Parameters:
 - `math_pr` - Math PR (Example: PR-123)
 
 Checkout the [README](jobs/cmdstan-performance-tests.md) for more technical details.
+
+## Custom CmdStan Performance Tests
+
+### History
+
+- History can be found [here](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests/job/Custom/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [Custom CmdStan Performance Tests](https://jenkins.mc-stan.org/job/CmdStan%20Performance%20Tests/job/Custom/)
+
+Parameters:  
+
+- `cmdstan_origin_pr` - CmdStan hash/branch to base hash/branch. Example: PR-123 or e6c3010fd0168ef961a531d56b2330fd64728523 or develop
+- `cmdstan_pr` - CmdStan hash/branch to compare against.
+- `stan_pr` - Stan PR to test against.
+- `math_pr` - Math PR to test against.
+
+- `make_local_windows` - Make/file contents for the windows machine
+- `make_local_linux` - Make/file contents for the linux machine
+- `make_local_macosx` - Make/file contents for the macos machine
+  
+- `run_windows` - True/False to run tests on windows
+- `golds_runs_windows` - Number of runs for golds
+- `shotguns_runs_windows` - Number of runs for shotguns
+
+- `run_linux` - True/False to run tests on linux
+- `golds_runs_linux` - Number of runs for golds
+- `shotguns_runs_linux` - Number of runs for shotguns
+
+- `run_macosx` - True/False to run tests on macos
+- `golds_runs_macosx` - Number of runs for golds
+- `shotguns_runs_macosx` - Number of runs for shotguns
+
+Checkout the [README](jobs/custom-cmdstan-performance-tests.md) for more technical details.
+
+## Daily Stan Performance
+
+### History
+
+- History can be found [here](https://jenkins.mc-stan.org/job/Daily%20Stan%20Performance/)
+
+### Jenkinsfile
+
+Link to Jenkins project: [CmdStan Performance Tests](https://jenkins.mc-stan.org/job/Daily%20Stan%20Performance/)
+This is a visual job rather than scripted Jenkins pipeline, you can find it [here](https://jenkins.mc-stan.org/job/Daily%20Stan%20Performance/configure)  
+
+Parameters:  
+None  
+
+Checkout the [README](jobs/daily-stan-performance.md) for more technical details.
 
 ## Build Docs
 
