@@ -11,6 +11,10 @@ Go to the [results page](https://jenkins.mc-stan.org/job/stanc3-test-binaries/) 
 on top-left you need to click on `status`.  
 Now you should be able to see a list of `Build Artifacts` from where you can click & download the binary you need.  
 
+You can use:   
+`STANC3_TEST_BIN_URL=https://jenkins.mc-stan.org/job/stanc3-test-binaries/{build_number}/artifact` in `make/local`.  
+Where `build_number` is your job # from Jenkins, you can find in in the URL of your job or Jenkins UI.  
+
 ### Jenkinsfile
 
 Link to Jenkins project: [Stanc3](https://jenkins.mc-stan.org/job/stanc3-test-binaries/)
