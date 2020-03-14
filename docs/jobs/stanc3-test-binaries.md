@@ -25,7 +25,7 @@ Stages:
      - `eval \$(opam env)`
      - `dune build @install`
      - `sh "mkdir -p bin && mv _build/default/src/stanc/stanc.exe bin/stanc"`
-     - Stash `bin/stanc, notes/working-models.txt` for later use
+     - Archive `bin/stanc, notes/working-models.txt` for later use
 2. [Build and test static release binaries](https://github.com/stan-dev/stanc3/blob/master/Jenkinsfile#L158)
     - Only on master
     - Will run in parallel
@@ -42,7 +42,7 @@ Stages:
         - `time dune runtest --verbose`
         - ```mkdir -p bin && mv `find _build -name stanc.exe` bin/mac-stanc```
         - `mv _build/default/src/stan2tfp/stan2tfp.exe bin/mac-stan2tfp`
-        - Stash `bin/*` for later use 
+        - Archive `bin/*` for later use 
       - Build stanc.js
         - Build using [Dockerfile](https://github.com/stan-dev/stanc3/blob/master/docker/debian/Dockerfile) with arguments `-u root --entrypoint=\'\'`
         - `eval \$(opam env)`
@@ -50,7 +50,7 @@ Stages:
         - `dune build --profile release src/stancjs`
         - ```mkdir -p bin && mv `find _build -name stancjs.bc.js` bin/stanc.js```
         - ```mv `find _build -name index.html` bin/load_stanc.html```
-        - Stash `bin/*` for later use 
+        - Archive `bin/*` for later use 
       - Build & test a static Linux binary
         - Build using [Dockerfile](https://github.com/stan-dev/stanc3/blob/master/docker/static/Dockerfile) with arguments `-u 1000 --entrypoint=\'\'`
         - `eval \$(opam env)`
@@ -61,9 +61,9 @@ Stages:
         - `time dune runtest --profile static --verbose`
         - ```mkdir -p bin && mv `find _build -name stanc.exe` bin/linux-stanc```
         - ```mv `find _build -name stan2tfp.exe` bin/linux-stan2tfp```
-        - Stash `bin/*` for later use 
+        - Archive `bin/*` for later use 
       - Build & test static Windows binary ( WSL label )
         - `bat "bash -cl \"eval \$(opam env) make clean; dune subst; dune build -x windows; dune runtest --verbose\""`
         - `bat """bash -cl "rm -rf bin/*; mkdir -p bin; mv _build/default.windows/src/stanc/stanc.exe bin/windows-stanc" """`
         - `bat "bash -cl \"mv _build/default.windows/src/stan2tfp/stan2tfp.exe bin/windows-stan2tfp\""`
-        - Stash `bin/*` for later use 
+        - Archive `bin/*` for later use 
