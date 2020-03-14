@@ -19,18 +19,22 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
   - [Stanc3](#stanc3)
     - [History](#history-3)
     - [Jenkinsfile](#jenkinsfile-3)
-  - [CmdStan Performance Tests](#cmdstan-performance-tests)
+  - [Stanc3 Test Binaries](#stanc3-test-binaries)
     - [History](#history-4)
+    - [Getting the binaries](#getting-the-binaries)
     - [Jenkinsfile](#jenkinsfile-4)
-  - [Custom CmdStan Performance Tests](#custom-cmdstan-performance-tests)
+  - [CmdStan Performance Tests](#cmdstan-performance-tests)
     - [History](#history-5)
     - [Jenkinsfile](#jenkinsfile-5)
-  - [Daily Stan Performance](#daily-stan-performance)
+  - [Custom CmdStan Performance Tests](#custom-cmdstan-performance-tests)
     - [History](#history-6)
     - [Jenkinsfile](#jenkinsfile-6)
-  - [Build Docs](#build-docs)
+  - [Daily Stan Performance](#daily-stan-performance)
     - [History](#history-7)
     - [Jenkinsfile](#jenkinsfile-7)
+  - [Build Docs](#build-docs)
+    - [History](#history-8)
+    - [Jenkinsfile](#jenkinsfile-8)
 - [How To](#how-to)
     - [Extract job logs for debugging](#extract-job-logs-for-debugging)
     - [Check on which machine a job ran](#check-on-which-machine-a-job-ran)
@@ -143,6 +147,28 @@ Parameters:
 - `compile_all` - Try compiling all models in test/integration/good
 
 Checkout the [README](jobs/stanc3.md) for more technical details.
+
+## Stanc3 Test Binaries
+
+### History
+
+- History can be found [here](https://jenkins.mc-stan.org/job/stanc3-test-binaries/)
+
+### Getting the binaries
+
+A build usually takes around 10 minutes, after that you can download all the binaries straight from Jenkins.  
+Go to the [results page](https://jenkins.mc-stan.org/job/stanc3-test-binaries/) and click your build, you will be sent to a console log page, 
+on top-left you need to click on `status`.  
+Now you should be able to see a list of `Build Artifacts` from where you can click & download the binary you need.  
+
+### Jenkinsfile
+
+Link to Jenkins project: [Stanc3](https://jenkins.mc-stan.org/job/stanc3-test-binaries/)
+Parameters:  
+
+- `git_branch` - Please specify a git branch ( develop ), git hash ( aace72b6ccecbb750431c46f418879b325416c7d ), pull request ( PR-123 ), pull request from fork ( PR-123 )
+
+Checkout the [README](jobs/stanc3-test-binaries.md) for more technical details.
 
 ## CmdStan Performance Tests
 
