@@ -38,6 +38,7 @@ http://discourse.mc-stan.org/t/new-jenkins-jobs-tutorial/2383
 - [How To](#how-to)
     - [Extract job logs for debugging](#extract-job-logs-for-debugging)
     - [Check on which machine a job ran](#check-on-which-machine-a-job-ran)
+    - [The job failed because of downstream_tests, how do I see what failed ?](#the-job-failed-because-of-downstreamtests-how-do-i-see-what-failed)
 
 # Repositories
 
@@ -275,3 +276,15 @@ For windows just browse `https://jenkins.mc-stan.org/job/CmdStan/job/develop/598
 To debug on which machine a job ran just follow the above [Extract job logs for debugging](#extract-job-logs-for-debugging) to get the entire log.  
 Then simply open it inside an editor ( Ex. Visual Studio Code ) and `CTRL + F` for `Running on`.  
 What you should find looks like: `Running on gelman-group-linux`
+
+### The job failed because of downstream_tests, how do I see what failed ?
+
+Let's say for example that your [build](https://jenkins.mc-stan.org/blue/organizations/jenkins/Math%20Pipeline/detail/PR-1774/17/pipeline) is all green but except the downstream_tests part.  
+In the Blue Ocean interface, you can easily look to the bottom of the page, you will find `Triggered Builds` just click on it and it will redirect you to the downstream_tests build.  
+  
+Now if something failed in the downstream_tests you will see it with a red `X`, click on it and you will see all the respective logs.  
+If everything is green in the downstream_tests this means it's either an exception in Jenkins or a quality gate.  
+To check the Jenkins logs of the downstream_tests build, on top of the Blue Ocean page, to the left of the Login button there's an arrow which when clicked will send you to the Jenkins build view, here just click `Console Logs` and can see more in detail what was executed on the machine and what may have failed.  
+Another way to go to the Jenkins logs is to see the url,  
+Example: `https://jenkins.mc-stan.org/blue/organizations/jenkins/Stan/detail/downstream_tests/1403/pipeline` and then go to [Jenkins Dashboard](https://jenkins.mc-stan.org/) and browse the projects based on the Blue Ocean URL.  
+Example: `Stan/detail/downstream_tests/1403/pipeline` so we'll go to Stan, then downstream_tests then our build is #1403  
