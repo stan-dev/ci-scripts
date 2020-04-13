@@ -24,8 +24,8 @@ Parameters:
   
 Build:  
 
-1. Go to https://jenkins.mc-stan.org/ and click log in (I think anyone with permissions on the repo can log in).  
-2. Click stanc3-test-binaries from the list of jobs
+1. Go to https://jenkins.mc-stan.org/ and click log in.
+2. Click stanc3-test-binaries from the list of jobs.
 3. Click `Build with Parameters` and replace master with the PR label `(PR-XXX)` or branch name.
 4. You will see a new build under Build History in the left side with the number X (its currently 60). Once it stops blinking and it goes blue the build finished succesfully. If you see grey or red then it failed and you need to investigate.  
 5. Add `STANC3_TEST_BIN_URL=https://jenkins.mc-stan.org/job/stanc3-test-binaries/X/artifact` to make/local in cmdstan and run `rm bin/stanc` and `make build` and you are good to go.
