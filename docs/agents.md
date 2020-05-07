@@ -93,7 +93,7 @@
 
 ### Windows
 
-Currently not scaling up because of `cc1plus.exe: out of memory allocating 65536 bytes`
+Operational
 
 - Instance type: `m5d.8xlarge`
 - Operating System: `Windows Server 2019 Datacenter (Version 1809) (OS Build 17763.379)`
