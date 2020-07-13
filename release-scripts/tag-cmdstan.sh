@@ -21,7 +21,6 @@ _steps[1]="Verify CmdStan is clean and up to date"
 _steps[2]="Create release branch using git."
 _steps[3]="Update Stan to tagged version."
 _steps[4]="Update version number."
-_steps[5]="Build documentation."
 _steps[6]="Test build. Git push."
 _steps[8]="Merge into develop."
 _steps[9]="Git tag version."
@@ -182,19 +181,6 @@ replace_version .github/ISSUE_TEMPLATE.md
 git commit -m "release/v$version: updating version numbers" -a
 
 popd > /dev/null
-
-
-########################################
-## 5. Build documentation
-########################################0
-print_step 5
-_msg="Building documentation"
-pushd $cmdstan_directory > /dev/null
-
-make manual > /dev/null
-
-popd > /dev/null
-
 
 ########################################
 ## 6. Test. Git push
