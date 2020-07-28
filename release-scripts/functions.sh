@@ -56,7 +56,8 @@ read_math_patch_version() {
 
 
 read_cmdstan_version() {
-  sed -e 's/^.*{\\cmdstanversion}{\(.*\)}/\1/p' -n $cmdstan_directory/src/docs/cmdstan-guide/cmdstan-guide.tex
+  #sed -e 's/^.*{\\cmdstanversion}{\(.*\)}/\1/p' -n $cmdstan_directory/src/docs/cmdstan-guide/cmdstan-guide.tex
+  sed -e 's/CMDSTAN_VERSION := \(.*\)/\1/p' -n $cmdstan_directory/makefile
 }
 
 ## check the version number: currently verifies there are two periods
