@@ -14,6 +14,7 @@
 - [ ] Create the Stan Release notes
 - [ ] Create the Cmdstan Release notes
 - [ ] Create the Stanc3 Release notes
+- [ ] Rebuild and publish docs for the new version
 - [ ] Create the Math release
 - [ ] Create the Stan release
 - [ ] Create the Stanc3 release
