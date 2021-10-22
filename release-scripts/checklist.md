@@ -6,8 +6,8 @@
 - [ ] Create a release candidate tarball for x86. Make sure RC tarballs include stanc3 binaries.
 - [ ] Check external links in docs (i.e. TBB docs link)
 - [ ] Create a release candidate feature/bugfix list (major features/bugfixes that need testing, link to new docs in Github)
-- [ ] Run [CmdstanR tests](https://github.com/stan-dev/cmdstanr/actions/workflows/cmdstan-tarball-check.yaml) with the RC tarball.
-- [ ] Run CmdstanPy tests with the RC tarball.
+- [ ] Run [CmdStanR tests](https://github.com/stan-dev/cmdstanr/actions/workflows/cmdstan-tarball-check.yaml) with the RC tarball.
+- [ ] Run CmdStanPy tests with the RC tarball.
 - [ ] Make a Discourse RC post.
 - [ ] Post a tweet with a link to the Discourse RC post.
 
