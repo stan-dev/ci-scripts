@@ -183,7 +183,6 @@ git commit -m "release/v$version: updating version numbers" -a
 
 popd > /dev/null
 
-
 ########################################
 ## 5. Build documentation
 ########################################0
@@ -194,7 +193,6 @@ popd > /dev/null
 #make manual > /dev/null
 
 #popd > /dev/null
-
 
 ########################################
 ## 6. Test. Git push
