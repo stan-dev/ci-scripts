@@ -1,5 +1,7 @@
+# Base image
 FROM debian:buster-slim
 
+# Update repositories and install OS deps
 RUN apt-get update
 RUN apt-get install opam curl bzip2 git tar curl ca-certificates openssl m4 bash -y
 
