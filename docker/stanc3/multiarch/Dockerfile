@@ -55,5 +55,5 @@ RUN if [ $(cat ./arch) = "mips64el" ]; then \
     curl https://raw.githubusercontent.com/stan-dev/stanc3/master/scripts/install_build_deps.sh | bash; \
     fi
 
-# Cleanup.
+# Cleanup .
 RUN rm ./arch && rm ./qarch
