@@ -1,4 +1,4 @@
-# Pull the ubuntu:bionic image
+# Pull the ubuntu:bionic base image
 FROM ubuntu:bionic
 
 # Install OS dependencies
