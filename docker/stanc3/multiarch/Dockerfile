@@ -40,7 +40,7 @@ RUN if [ $(cat ./arch) = "mips64el" ]; then \
 RUN eval $(opam env) && opam repo add internet https://opam.ocaml.org
 
 
-RUN curl https://raw.githubusercontent.com/stan-dev/stanc3/master/scripts/install_build_deps.sh | bash; \
+RUN curl https://raw.githubusercontent.com/stan-dev/stanc3/master/scripts/install_build_deps.sh | bash
 
 # Cleanup
 RUN rm ./arch && rm ./qarch
