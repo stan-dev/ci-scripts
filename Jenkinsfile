@@ -88,37 +88,39 @@ pipeline {
         }
 
         stage("stanc3 multiarch") {
-           when {
-               allOf {
-                   expression { !skipMultiArch }
-                   expression { params.buildMultiarch }
-               }
-           }
-           steps{
-               script {
-                   setTags()
-                   installDockerBuildX()
-                   cleanCheckout()
-               }
-               sh """
-                   docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                   docker buildx create --name stanc3_builder || true
-                   docker buildx use stanc3_builder
-                   docker buildx inspect --bootstrap
-                   echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                   cd docker/stanc3/multiarch
-                   docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=$stanc3_branch --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
-               """
+            beforeAgent true
+            when {
+                allOf {
+                    expression { !skipMultiArch }
+                    expression { params.buildMultiarch }
+                }
+            }
+            steps{
+                script {
+                    setTags()
+                    installDockerBuildX()
+                    cleanCheckout()
+                }
+                sh """
+                    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                    docker buildx create --name stanc3_builder || true
+                    docker buildx use stanc3_builder
+                    docker buildx inspect --bootstrap
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    cd docker/stanc3/multiarch
+                    docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=$stanc3_branch --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
+                """
            }
        }
 
         stage("stanc3 static") {
-           when {
-               allOf {
-                   expression { !skipStatic }
-                   expression { params.buildStatic }
-               }
-           }
+            beforeAgent true
+            when {
+                allOf {
+                    expression { !skipStatic }
+                    expression { params.buildStatic }
+                }
+            }
            steps{
                script {
                    installDockerBuildX()
@@ -136,29 +138,31 @@ pipeline {
         }
 
         stage("stanc3 debian") {
-           when {
-               allOf {
-                   expression { !skipDebian }
-                   expression { params.buildDebian }
-               }
-           }
-           steps{
-               script {
-                   installDockerBuildX()
-                   cleanCheckout()
-               }
-               sh """
-                   git clone https://github.com/$stanc3_org/stanc3.git
-                   cd stanc3
-                   git checkout $stanc3_branch
-                   echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                   docker build -t stanorg/stanc3:$debianTag -f ../docker/stanc3/debian/Dockerfile .
-                   docker push stanorg/stanc3:$debianTag
-               """
+            beforeAgent true
+            when {
+                allOf {
+                    expression { !skipDebian }
+                    expression { params.buildDebian }
+                }
+            }
+            steps{
+                script {
+                    installDockerBuildX()
+                    cleanCheckout()
+                }
+                sh """
+                    git clone https://github.com/$stanc3_org/stanc3.git
+                    cd stanc3
+                    git checkout $stanc3_branch
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker build -t stanorg/stanc3:$debianTag -f ../docker/stanc3/debian/Dockerfile .
+                    docker push stanorg/stanc3:$debianTag
+                """
            }
        }
 
         stage("stanc3 debian-windows") {
+            beforeAgent true
             when {
                 allOf {
                     expression { !skipDebianWindows }
@@ -182,6 +186,7 @@ pipeline {
         }
 
         stage("update DockerHub main tags") {
+            beforeAgent true
             when {
                 expression { params.replaceMainTags }
             }
