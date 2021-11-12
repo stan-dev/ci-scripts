@@ -2,6 +2,7 @@
 FROM debian:buster-slim
 
 ARG STANC3_BRANCH=master
+ARG STANC3_ORG=stan-dev
 
 # Update repositories and install OS deps
 RUN apt-get update
@@ -53,10 +54,10 @@ RUN if [ $(cat ./arch) = "mips64el" ]; then \
 
 # If menhir already manually installed, then remove install command from bash script
 RUN if [ $(cat ./arch) = "mips64el" ]; then \
-    curl https://raw.githubusercontent.com/stan-dev/stanc3/${STANC3_BRANCH}/scripts/install_build_deps.sh | \
+    curl https://raw.githubusercontent.com/${STANC3_ORG}/stanc3/${STANC3_BRANCH}/scripts/install_build_deps.sh | \
     sed 's/menhir.20181113//' | bash; \
     else \
-    curl https://raw.githubusercontent.com/stan-dev/stanc3/${STANC3_BRANCH}/scripts/install_build_deps.sh | bash; \
+    curl https://raw.githubusercontent.com/${STANC3_ORG}/stanc3/${STANC3_BRANCH}/scripts/install_build_deps.sh | bash; \
     fi
 
 # Cleanup

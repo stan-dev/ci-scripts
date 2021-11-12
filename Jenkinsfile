@@ -2,6 +2,8 @@
 @Library('StanUtils')
 import org.stan.Utils
 
+def utils = new org.stan.Utils()
+
 def installDockerBuildX(){
     def latest = """LATEST=\$(wget -qO- "https://api.github.com/repos/docker/buildx/releases/latest" | jq -r .name)
               |wget https://github.com/docker/buildx/releases/download/\$LATEST/buildx-\$LATEST.linux-amd64
@@ -14,45 +16,30 @@ def installDockerBuildX(){
 
 def cleanCheckout(){
     deleteDir()
-    checkout([$class: 'GitSCM',
-        branches: [[name: "*/$ciscripts_branch"]],
-        doGenerateSubmoduleConfigurations: false,
-        extensions: [],
-        submoduleCfg: [],
-        userRemoteConfigs: [[url: "https://github.com/$ciscripts_org/ci-scripts.git", credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b']]])
+    sh """
+        git clone https://github.com/$ciscripts_org/ci-scripts.git .
+        git checkout $ciscripts_branch
+    """
 }
 
-// Base tags for master branch
-def multiArchTag = "multiarch"
-def staticTag = "static"
-def debianTag = "debian"
-def debianWindowsTag = "debian-windows"
-
-// Set tags if we're passing different values than master
-def setTags(){
-    if (params.stanc3_branch != "master"){
-        multiArchTag = "multiarch-" + params.stanc3_branch
-        staticTag = "static-" + params.stanc3_branch
-        debianTag = "debian-" + params.stanc3_branch
-        debianWindowsTag = "debian-windows-" + params.stanc3_branch
-    }
-    else if (params.ciscripts_branch != "master"){
-        multiArchTag = "multiarch-" + params.ciscripts_branch
-        staticTag = "static-" + params.ciscripts_branch
-        debianTag = "debian-" + params.ciscripts_branch
-        debianWindowsTag = "debian-windows-" + params.ciscripts_branch
-    }
-}
-
+// Do not skip any build by default
 def skipMultiArch = false
 def skipStatic = false
 def skipDebian = false
 def skipDebianWindows = false
 
+// Base tags for master branch
+def multiArchTag = ""
+def staticTag = ""
+def debianTag = ""
+def debianWindowsTag = ""
+
 pipeline {
     agent { label 'gg-linux' }
 	environment {
 		DOCKERHUB_CREDENTIALS=credentials('acdd7926-9ee7-4f51-863f-14ee5bca1f4c')
+		GIT_URL="https://github.com/stan-dev/ci-scripts.git"
+		BRANCH_NAME="${params.ciscripts_branch}"
 	}
 	options {
 	    skipDefaultCheckout()
@@ -74,7 +61,6 @@ pipeline {
     stages {
 
         stage('Verify changes') {
-            agent { label 'linux' }
             steps {
                 script {
                     cleanCheckout()
@@ -83,6 +69,33 @@ pipeline {
                     skipStatic = utils.verifyChanges(['docker/stanc3/static/Dockerfile'].join(" "))
                     skipDebian = utils.verifyChanges(['docker/stanc3/debian/Dockerfile'].join(" "))
                     skipDebianWindows = utils.verifyChanges(['docker/stanc3/debian-windows/Dockerfile'].join(" "))
+
+                    println "Setting tags for stanc3 branch ${params.stanc3_branch} or ci-scripts branch ${params.ciscripts_branch}"
+
+                    def stanc3 = params.stanc3_branch.toString()
+                    def ciscripts = params.ciscripts_branch.toString()
+
+                    if (stanc3 != "master"){
+                        multiArchTag = "multiarch-" + stanc3
+                        staticTag = "static-" + stanc3
+                        debianTag = "debian-" + stanc3
+                        debianWindowsTag = "debian-windows-" + params.stanc3_branch
+                        println "Tags set from stanc3 ${params.stanc3_branch}"
+                    }
+                    else if (ciscripts != "master"){
+                        multiArchTag = "multiarch-" + ciscripts
+                        staticTag = "static-" + ciscripts
+                        debianTag = "debian-" + ciscripts
+                        debianWindowsTag = "debian-windows-" + ciscripts
+                        println "Tags set from ci-scripts ${params.ciscripts_branch}"
+                    }
+                    else{
+                        multiArchTag = "multiarch"
+                        staticTag = "static"
+                        debianTag = "debian"
+                        debianWindowsTag = "debian-windows"
+                        println "Tags set from master"
+                    }
                 }
             }
         }
@@ -97,7 +110,6 @@ pipeline {
             }
             steps{
                 script {
-                    setTags()
                     installDockerBuildX()
                     cleanCheckout()
                 }
@@ -108,12 +120,13 @@ pipeline {
                     docker buildx inspect --bootstrap
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
                     cd docker/stanc3/multiarch
-                    docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=$stanc3_branch --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
+                    docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=$stanc3_branch --build-arg STANC3_ORG=$stanc3_org --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
                 """
            }
        }
 
         stage("stanc3 static") {
+
             when {
                 beforeAgent true
                 allOf {
@@ -121,20 +134,20 @@ pipeline {
                     expression { params.buildStatic }
                 }
             }
-           steps{
-               script {
-                   installDockerBuildX()
-                   cleanCheckout()
-               }
-               sh """
-                   git clone https://github.com/$stanc3_org/stanc3.git
-                   cd stanc3
-                   git checkout $stanc3_branch
-                   echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                   docker build -t stanorg/stanc3:$staticTag -f ../docker/stanc3/static/Dockerfile .
-                   docker push stanorg/stanc3:$staticTag
-               """
-           }
+            steps{
+                script {
+                    installDockerBuildX()
+                    cleanCheckout()
+                }
+                sh """
+                    git clone https://github.com/$stanc3_org/stanc3.git
+                    cd stanc3
+                    git checkout $stanc3_branch
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker build -t stanorg/stanc3:$staticTag -f ../docker/stanc3/static/Dockerfile .
+                    docker push stanorg/stanc3:$staticTag
+                """
+            }
         }
 
         stage("stanc3 debian") {
@@ -170,18 +183,18 @@ pipeline {
                 }
             }
             steps{
-               script {
-                   installDockerBuildX()
-                   cleanCheckout()
-               }
-               sh """
-                    git clone https://github.com/$stanc3_org/stanc3.git
-                    cd stanc3
-                    git checkout $stanc3_branch
-                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker build -t stanorg/stanc3:$debianWindowsTag -f ../docker/stanc3/debian-windows/Dockerfile .
-                    docker push stanorg/stanc3:$debianWindowsTag
-               """
+                script {
+                    installDockerBuildX()
+                    cleanCheckout()
+                }
+                sh """
+                     git clone https://github.com/$stanc3_org/stanc3.git
+                     cd stanc3
+                     git checkout $stanc3_branch
+                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                     docker build -t stanorg/stanc3:$debianWindowsTag -f ../docker/stanc3/debian-windows/Dockerfile .
+                     docker push stanorg/stanc3:$debianWindowsTag
+                """
             }
         }
 
@@ -192,7 +205,6 @@ pipeline {
             }
             steps{
                 script {
-                    setTags()
                     installDockerBuildX()
                 }
                 sh """
