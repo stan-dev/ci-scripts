@@ -1,4 +1,6 @@
 #!/usr/bin/env groovy
+@Library('StanUtils')
+import org.stan.Utils
 
 def installDockerBuildX(){
     def latest = """LATEST=\$(wget -qO- "https://api.github.com/repos/docker/buildx/releases/latest" | jq -r .name)
@@ -42,6 +44,11 @@ def setTags(){
     }
 }
 
+def skipMultiArch = false
+def skipStatic = false
+def skipDebian = false
+def skipDebianWindows = false
+
 pipeline {
     agent { label 'gg-linux' }
 	environment {
@@ -66,10 +73,24 @@ pipeline {
     }
     stages {
 
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
+                script {
+                    cleanCheckout()
+
+                    skipMultiArch = utils.verifyChanges(['docker/stanc3/multiarch/Dockerfile'].join(" "))
+                    skipStatic = utils.verifyChanges(['docker/stanc3/static/Dockerfile'].join(" "))
+                    skipDebian = utils.verifyChanges(['docker/stanc3/debian/Dockerfile'].join(" "))
+                    skipDebianWindows = utils.verifyChanges(['docker/stanc3/debian-windows/Dockerfile'].join(" "))
+                }
+            }
+        }
+
         stage("stanc3 multiarch") {
            when {
                allOf {
-                   changeset "docker/stanc3/multiarch/Dockerfile"
+                   expression { !skipMultiArch }
                    expression { params.buildMultiarch }
                }
            }
@@ -94,7 +115,7 @@ pipeline {
         stage("stanc3 static") {
            when {
                allOf {
-                   changeset "docker/stanc3/static/Dockerfile"
+                   expression { !skipStatic }
                    expression { params.buildStatic }
                }
            }
@@ -117,7 +138,7 @@ pipeline {
         stage("stanc3 debian") {
            when {
                allOf {
-                   changeset "docker/stanc3/debian/Dockerfile"
+                   expression { !skipDebian }
                    expression { params.buildDebian }
                }
            }
@@ -140,7 +161,7 @@ pipeline {
         stage("stanc3 debian-windows") {
             when {
                 allOf {
-                    changeset "docker/stanc3/debian-windows/Dockerfile"
+                    expression { !skipDebianWindows }
                     expression { params.buildDebian }
                 }
             }
