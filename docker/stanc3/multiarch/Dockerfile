@@ -1,6 +1,12 @@
 # Base image
 FROM debian:buster-slim
 
+ARG STANC3_BRANCH=master
+ENV STANC3_BRANCH_ENV=${STANC3_BRANCH}
+
+ARG STANC3_ORG=stan-dev
+ENV STANC3_ORG_ENV=${STANC3_ORG}
+
 # Update repositories and install OS deps
 RUN apt-get update
 RUN apt-get install opam curl bzip2 git tar curl ca-certificates openssl m4 bash -y
@@ -40,7 +46,7 @@ RUN if [ $(cat ./arch) = "mips64el" ]; then \
 RUN eval $(opam env) && opam repo add internet https://opam.ocaml.org
 
 
-RUN curl https://raw.githubusercontent.com/stan-dev/stanc3/master/scripts/install_build_deps.sh | bash
+RUN curl https://raw.githubusercontent.com/${STANC3_ORG_ENV}/stanc3/${STANC3_BRANCH_ENV}/scripts/install_build_deps.sh | bash
 
 # Cleanup
 RUN rm ./arch && rm ./qarch
