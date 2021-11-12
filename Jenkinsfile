@@ -88,8 +88,8 @@ pipeline {
         }
 
         stage("stanc3 multiarch") {
-            beforeAgent true
             when {
+                beforeAgent true
                 allOf {
                     expression { !skipMultiArch }
                     expression { params.buildMultiarch }
@@ -114,8 +114,8 @@ pipeline {
        }
 
         stage("stanc3 static") {
-            beforeAgent true
             when {
+                beforeAgent true
                 allOf {
                     expression { !skipStatic }
                     expression { params.buildStatic }
@@ -138,8 +138,8 @@ pipeline {
         }
 
         stage("stanc3 debian") {
-            beforeAgent true
             when {
+                beforeAgent true
                 allOf {
                     expression { !skipDebian }
                     expression { params.buildDebian }
@@ -186,8 +186,8 @@ pipeline {
         }
 
         stage("update DockerHub main tags") {
-            beforeAgent true
             when {
+                beforeAgent true
                 expression { params.replaceMainTags }
             }
             steps{
