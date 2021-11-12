@@ -4,16 +4,6 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def installDockerBuildX(){
-    def latest = """LATEST=\$(wget -qO- "https://api.github.com/repos/docker/buildx/releases/latest" | jq -r .name)
-              |wget https://github.com/docker/buildx/releases/download/\$LATEST/buildx-\$LATEST.linux-amd64
-              |chmod a+x buildx-\$LATEST.linux-amd64
-              |mkdir -p ~/.docker/cli-plugins
-              |mv buildx-\$LATEST.linux-amd64 ~/.docker/cli-plugins/docker-buildx""".stripMargin()
-
-    sh (returnStdout: true, script: "${latest}").trim()
-}
-
 def cleanCheckout(){
     deleteDir()
     sh """
@@ -110,7 +100,6 @@ pipeline {
             }
             steps{
                 script {
-                    installDockerBuildX()
                     cleanCheckout()
                 }
                 sh """
@@ -120,7 +109,7 @@ pipeline {
                     docker buildx inspect --bootstrap
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
                     cd docker/stanc3/multiarch
-                    docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=$stanc3_branch --build-arg STANC3_ORG=$stanc3_org --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
+                    docker buildx build -t stanorg/stanc3:$multiArchTag --build-arg STANC3_BRANCH=${params.stanc3_branch} --build-arg STANC3_ORG=${params.stanc3_org} --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
                 """
            }
        }
@@ -136,7 +125,6 @@ pipeline {
             }
             steps{
                 script {
-                    installDockerBuildX()
                     cleanCheckout()
                 }
                 sh """
@@ -160,7 +148,6 @@ pipeline {
             }
             steps{
                 script {
-                    installDockerBuildX()
                     cleanCheckout()
                 }
                 sh """
@@ -184,7 +171,6 @@ pipeline {
             }
             steps{
                 script {
-                    installDockerBuildX()
                     cleanCheckout()
                 }
                 sh """
@@ -204,9 +190,6 @@ pipeline {
                 expression { params.replaceMainTags }
             }
             steps{
-                script {
-                    installDockerBuildX()
-                }
                 sh """
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
 
