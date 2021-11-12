@@ -162,8 +162,8 @@ pipeline {
        }
 
         stage("stanc3 debian-windows") {
-            beforeAgent true
             when {
+                beforeAgent true
                 allOf {
                     expression { !skipDebianWindows }
                     expression { params.buildDebian }
