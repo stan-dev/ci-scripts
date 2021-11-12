@@ -7,7 +7,6 @@ USER root
 
 #Add opam group
 
-RUN addgroup -g 1000 opam
 RUN addgroup -g 1004 jenkins-slave
 
 RUN delgroup opam nogroup
