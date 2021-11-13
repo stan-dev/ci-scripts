@@ -12,12 +12,6 @@ def cleanCheckout(){
     """
 }
 
-// Do not skip any build by default
-def skipMultiArch = false
-def skipStatic = false
-def skipDebian = false
-def skipDebianWindows = false
-
 // Base tags for master branch
 def multiArchTag = ""
 def staticTag = ""
@@ -25,7 +19,7 @@ def debianTag = ""
 def debianWindowsTag = ""
 
 pipeline {
-    agent { label 'gg-linux' }
+    agent none
 	environment {
 		DOCKERHUB_CREDENTIALS=credentials('acdd7926-9ee7-4f51-863f-14ee5bca1f4c')
 		GIT_URL="https://github.com/stan-dev/ci-scripts.git"
@@ -46,20 +40,13 @@ pipeline {
         booleanParam(defaultValue: true, description: 'Build debian docker image', name: 'buildDebianWindows')
 
         booleanParam(defaultValue: false, description: 'Whenever to run the job that updates the Docker Hub main tags with the ones from a WIP branch. Make sure to uncheck Docker images builds as they\'re not needed if we ran the build before. Might need rebuild if it\'s a multi-arch image', name: 'replaceMainTags')
-
     }
     stages {
 
-        stage('Verify changes') {
+        stage('Set tags') {
+            agent { label 'gg-linux' }
             steps {
                 script {
-                    cleanCheckout()
-
-                    skipMultiArch = utils.verifyChanges(['docker/stanc3/multiarch/Dockerfile'].join(" "))
-                    skipStatic = utils.verifyChanges(['docker/stanc3/static/Dockerfile'].join(" "))
-                    skipDebian = utils.verifyChanges(['docker/stanc3/debian/Dockerfile'].join(" "))
-                    skipDebianWindows = utils.verifyChanges(['docker/stanc3/debian-windows/Dockerfile'].join(" "))
-
                     println "Setting tags for stanc3 branch ${params.stanc3_branch} or ci-scripts branch ${params.ciscripts_branch}"
 
                     def stanc3 = params.stanc3_branch.toString()
@@ -94,10 +81,10 @@ pipeline {
             parallel {
 
                 stage("stanc3 multiarch") {
+                    agent { label 'gg-linux' }
                      when {
                          beforeAgent true
                          allOf {
-                             expression { !skipMultiArch }
                              expression { params.buildMultiarch }
                          }
                      }
@@ -118,11 +105,10 @@ pipeline {
                 }
 
                 stage("stanc3 static") {
-                
+                    agent { label 'gg-linux' }
                     when {
                         beforeAgent true
                         allOf {
-                            expression { !skipStatic }
                             expression { params.buildStatic }
                         }
                     }
@@ -142,10 +128,10 @@ pipeline {
                 }
 
                 stage("stanc3 debian") {
+                    agent { label 'gg-linux' }
                     when {
                         beforeAgent true
                         allOf {
-                            expression { !skipDebian }
                             expression { params.buildDebian }
                         }
                     }
@@ -165,10 +151,10 @@ pipeline {
                 }
 
                 stage("stanc3 debian-windows") {
+                    agent { label 'gg-linux' }
                     when {
                         beforeAgent true
                         allOf {
-                            expression { !skipDebianWindows }
                             expression { params.buildDebian }
                         }
                     }
@@ -191,6 +177,7 @@ pipeline {
         }
 
         stage("update DockerHub main tags") {
+            agent { label 'gg-linux' }
             when {
                 beforeAgent true
                 expression { params.replaceMainTags }
