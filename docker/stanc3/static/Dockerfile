@@ -1,13 +1,12 @@
 #Use Official Docker Images for OCAML/OPAM
 #https://github.com/ocaml/infrastructure/wiki/Containers
-FROM ocaml/opam2:alpine-3.9-ocaml-4.07
+FROM ocaml/opam:alpine-ocaml-4.12
 
 #Switch to root user so we can install apk packages
 USER root
 
 #Add opam group
 
-RUN addgroup -g 1000 opam
 RUN addgroup -g 1004 jenkins-slave
 
 RUN delgroup opam nogroup
@@ -32,8 +31,8 @@ USER opam
 
 #Init opam, create and switch to 4.07.0, update shell environment
 RUN opam init --disable-sandboxing -y
-RUN opam switch create 4.07.0
-RUN opam switch 4.07.0
+RUN opam switch create 4.12.0
+RUN opam switch 4.12.0
 RUN eval $(opam env)
 
 RUN opam repo add internet https://opam.ocaml.org
