@@ -187,7 +187,7 @@ pipeline {
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
 
                     echo "Pulling $multiArchTag tag and replacing multiarch"
-                    docker pull --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x stanorg/stanc3:$multiArchTag
+                    docker pull stanorg/stanc3:$multiArchTag
                     docker tag stanorg/stanc3:multiarch stanorg/stanc3:$multiArchTag
                     docker push stanorg/stanc3:multiarch
 
