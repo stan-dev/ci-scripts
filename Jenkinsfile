@@ -186,23 +186,15 @@ pipeline {
                 sh """
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
 
-                    echo "Pulling $multiArchTag tag and replacing multiarch"
-                    docker pull stanorg/stanc3:$multiArchTag
                     docker tag stanorg/stanc3:multiarch stanorg/stanc3:$multiArchTag
                     docker push stanorg/stanc3:multiarch
 
-                    echo "Pulling $staticTag tag and replacing static"
-                    docker pull stanorg/stanc3:$staticTag
                     docker tag stanorg/stanc3:static stanorg/stanc3:$staticTag
                     docker push stanorg/stanc3:static
 
-                    echo "Pulling $debianTag tag and replacing debian"
-                    docker pull stanorg/stanc3:$debianTag
                     docker tag stanorg/stanc3:debian stanorg/stanc3:$debianTag
                     docker push stanorg/stanc3:debian
 
-                    echo "Pulling $debianWindowsTag tag and replacing debian-windows"
-                    docker pull stanorg/stanc3:$debianWindowsTag
                     docker tag stanorg/stanc3:debian-windows stanorg/stanc3:$debianWindowsTag
                     docker push stanorg/stanc3:debian-windows
                 """
