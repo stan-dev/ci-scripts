@@ -1,5 +1,6 @@
 
 **Feature freeze (INSERT DATE HERE):**
+- [ ] Ensure all expiring language deprecations have been removed or given new removal dates.
 - [ ] Create and merge version updating pull requests in Math/Stan/Cmdstan. These should be the last PRs accepted before the freeze.
 - [ ] Create Math/Stan RC releases.
 - [ ] Create Stanc3 RC binary.
@@ -15,7 +16,7 @@
 - [ ] Create the Math Release notes.
 - [ ] Create the Stan Release notes.
 - [ ] Create the Cmdstan Release notes.
-- [ ] Create the Stanc3 Release notes.
+- [ ] Create the Stanc3 Release notes, include new deprecations and removals.
 - [ ] Rebuild and publish docs for the new version.
 - [ ] Check that docs for the previous release links correctly to the newest docs.
 - [ ] Create the Math release.
