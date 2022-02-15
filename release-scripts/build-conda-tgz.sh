@@ -19,10 +19,7 @@ echo "Creating v$VERSION conda .tgz archive !"
 pip install --upgrade cmdstanpy
 
 # Install cmdstan
-python <<HEREDOC
-from cmdstanpy import install_cmdstan
-install_cmdstan(cores=2, progress=True, version="$VERSION")
-HEREDOC
+python -c "from cmdstanpy import install_cmdstan; install_cmdstan(cores=2, progress=True, version=\"$VERSION\")"
 
 # Create tgz archive
 cd $INSTALLATION_HOME/.cmdstan; tar -cf - cmdstan-$VERSION | gzip > $INSTALLATION_HOME/cmdstan-$VERSION.tgz
