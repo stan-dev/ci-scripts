@@ -21,7 +21,7 @@ pip install --upgrade cmdstanpy
 # Install cmdstan
 python <<HEREDOC
 from cmdstanpy import install_cmdstan
-install_cmdstan(cores=2, progress=True, version=$VERSION)
+install_cmdstan(cores=2, progress=True, version="$VERSION")
 HEREDOC
 
 # Create tgz archive
