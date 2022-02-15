@@ -3,7 +3,7 @@
 # Script used to install cmdstan on a GColab Machine and create a .tgz archive with the installation
 
 # Arguments:
-# $1: cmdstan version ( will determine archive name )
+# $1: cmdstan version in the form of 2.29.0 (major.minor.patch)
 
 # On a fresh colab instance simply run:
 # !curl https://raw.githubusercontent.com/stan-dev/ci-scripts/conda-tgz-script/release-scripts/build-conda-tgz.sh | bash -s -- 2.29.0
@@ -21,7 +21,7 @@ pip install --upgrade cmdstanpy
 # Install cmdstan
 python <<HEREDOC
 from cmdstanpy import install_cmdstan
-install_cmdstan(cores=2, progress=True)
+install_cmdstan(cores=2, progress=True, version=$VERSION)
 HEREDOC
 
 # Create tgz archive
