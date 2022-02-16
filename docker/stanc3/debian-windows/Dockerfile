@@ -39,4 +39,6 @@ RUN opam update; bash -x install_js_deps.sh
 #Specify our entrypoint
 ENTRYPOINT [ "opam", "config", "exec", "--" ]
 
-# docker build -f ../ci-scripts/docker/stanc3/debian-windows/Dockerfile --build-arg PUID=990 --build-arg PGID=986 --progress=plain -t stanorg/stanc3:debian-windowsfi .
+# Build with:
+# cd stanc3
+# docker build -t stanorg/stanc3:debian-windowsfi --build-arg PUID=990 --progress=plain --build-arg PGID=986 -f ../ci-scripts/docker/stanc3/debian-windows/Dockerfile .

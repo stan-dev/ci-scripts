@@ -27,7 +27,7 @@ RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/co
 #Switch back to the normal user
 USER jenkins
 
-#Init opam, create and switch to 4.07.0, update shell environment
+#Init opam, create and switch to 4.12.0, update shell environment
 RUN opam init --disable-sandboxing -y
 RUN opam switch create 4.12.0
 RUN opam switch 4.12.0
@@ -38,5 +38,11 @@ RUN opam repo add internet https://opam.ocaml.org
 COPY ./scripts/install_build_deps.sh ./
 RUN opam update; bash -x install_build_deps.sh
 
+RUN opam install odoc -y
+
 #Specify our entrypoint
 ENTRYPOINT [ "opam", "config", "exec", "--" ]
+
+# Build with:
+# cd stanc3
+# docker build -t stanorg/stanc3:staticfi --build-arg PUID=990 --progress=plain --build-arg PGID=986 -f ../ci-scripts/docker/stanc3/static/Dockerfile .
