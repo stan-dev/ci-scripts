@@ -44,7 +44,7 @@ pipeline {
     stages {
 
         stage('Set tags') {
-            agent { label 'gg-linux' }
+            agent { label 'linux' }
             steps {
                 script {
                     println "Setting tags for stanc3 branch ${params.stanc3_branch} or ci-scripts branch ${params.ciscripts_branch}"
@@ -81,7 +81,7 @@ pipeline {
             parallel {
 
                 stage("stanc3 multiarch") {
-                    agent { label 'gg-linux' }
+                    agent { label 'linux' }
                      when {
                          beforeAgent true
                          allOf {
@@ -105,7 +105,7 @@ pipeline {
                 }
 
                 stage("stanc3 static") {
-                    agent { label 'gg-linux' }
+                    agent { label 'linux' }
                     when {
                         beforeAgent true
                         allOf {
@@ -128,7 +128,7 @@ pipeline {
                 }
 
                 stage("stanc3 debian") {
-                    agent { label 'gg-linux' }
+                    agent { label 'linux' }
                     when {
                         beforeAgent true
                         allOf {
@@ -151,7 +151,7 @@ pipeline {
                 }
 
                 stage("stanc3 debian-windows") {
-                    agent { label 'gg-linux' }
+                    agent { label 'linux' }
                     when {
                         beforeAgent true
                         allOf {
@@ -177,7 +177,7 @@ pipeline {
         }
 
         stage("update DockerHub main tags") {
-            agent { label 'gg-linux' }
+            agent { label 'linux' }
             when {
                 beforeAgent true
                 expression { params.replaceMainTags }

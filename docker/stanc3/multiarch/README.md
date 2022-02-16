@@ -44,5 +44,7 @@ Platforms: linux/amd64, linux/arm64, linux/riscv64, linux/ppc64le, linux/s390x, 
 Call `buildx` with the list of target architectures and target repository (note this requires calling `docker login` first)
 
 ```
-docker buildx build -t stanorg/stanc3:multiarch --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --push .
+docker buildx build -t stanorg/stanc3:multiarchfi --platform linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/mips64le,linux/s390x --build-arg PUID=990 --progress=plain --build-arg PGID=986 --push .
+docker buildx build -t stanorg/stanc3:multiarchfi --platform linux/mips64le --build-arg PUID=990 --progress=plain --no-cache --build-arg PGID=986 --push .
+docker buildx build -t stanorg/stanc3:multiarchfi --platform linux/arm/v6 --build-arg PUID=990 --progress=plain --build-arg PGID=986 --push .
 ```
