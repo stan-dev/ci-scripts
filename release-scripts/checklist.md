@@ -5,7 +5,7 @@
 - [ ] Create Math/Stan RC releases.
 - [ ] Create Stanc3 RC binary.
 - [ ] Create a release candidate tarball for x86. Make sure RC tarballs include stanc3 binaries.
-- [ ] Check external links in docs (i.e. TBB docs link)
+- [ ] Check external links in docs (i.e. TBB docs link) - use https://github.com/tcort/markdown-link-check
 - [ ] Create a release candidate feature/bugfix list (major features/bugfixes that need testing, link to new docs in Github)
 - [ ] Run [CmdStanR tests](https://github.com/stan-dev/cmdstanr/actions/workflows/cmdstan-tarball-check.yaml) with the RC tarball.
 - [ ] Run CmdStanPy tests with the RC tarball.
