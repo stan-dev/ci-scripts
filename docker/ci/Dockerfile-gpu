@@ -15,10 +15,6 @@ ENV CLANG_VERSION="6.0"
 ENV OPENMPI_VERSION="4.1"
 ENV OPENMPI_MINOR_VERSION="2"
 
-# /usr/local/sbin:/usr/local/.openmpi/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-# https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/15532/l_opencl_p_18.1.0.015.tgz
-
 # OpenCL™ 2.0 Driver for Intel® HD, Iris™, and Iris™ Pro Graphics for Linux* (64-bit)
 ENV INTEL_DRIVER_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/15532/l_opencl_p_18.1.0.015.tgz
 # Intel® SDK for OpenCL™ Applications 2016 R2 for Linux* (64 bit)
@@ -31,8 +27,6 @@ RUN apt-get install nvidia-driver-460 cuda-drivers-460 intel-opencl-icd nvidia-c
 RUN apt-get install doxygen binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${CLANG_VERSION} lld -y
 RUN apt-get install libxml2-dev linux-headers-generic libopenmpi-dev libxslt-dev mpi mpich -y
 RUN ln -sf python3 /usr/bin/python
-
-# mpi mpich openmpi-common libopenmpi-dev openmpi-bin nvidia-cuda-toolkit
 
 # Setup pip and requirements
 RUN pip3 install --no-cache --upgrade pip setuptools
