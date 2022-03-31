@@ -9,7 +9,8 @@ ENV TZ="America/New_York"
 # Will make python ignore some warnings for docker
 ENV PYTHONUNBUFFERED=1
 # Clang version
-ENV CLANG_VERSION="6.0"
+ENV CLANG_VERSION="7.0"
+ENV LLD_VERSION="7"
 
 # OpenMPI
 ENV OPENMPI_VERSION="4.1"
@@ -21,10 +22,10 @@ ENV INTEL_DRIVER_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas
 ENV INTEL_SDK_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/17206/intel_sdk_for_opencl_applications_2020.3.494.tar.gz
 
 # Install os dependencies and pip3
-RUN apt-get update -y
+RUN apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* && update-ca-certificates && apt-get update -y
 RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip -y
 RUN apt-get install nvidia-driver-460 cuda-drivers-460 intel-opencl-icd nvidia-cuda-toolkit opencl-headers clinfo -y
-RUN apt-get install doxygen binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${CLANG_VERSION} lld -y
+RUN apt-get install doxygen binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${LLD_VERSION} lld -y
 RUN apt-get install libxml2-dev linux-headers-generic libopenmpi-dev libxslt-dev mpi mpich -y
 RUN ln -sf python3 /usr/bin/python
 
