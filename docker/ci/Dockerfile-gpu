@@ -9,7 +9,7 @@ ENV TZ="America/New_York"
 # Will make python ignore some warnings for docker
 ENV PYTHONUNBUFFERED=1
 # Clang version
-ENV CLANG_VERSION="7.0"
+ENV CLANG_VERSION="7"
 ENV LLD_VERSION="7"
 
 # OpenMPI
