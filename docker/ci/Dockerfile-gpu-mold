@@ -1,0 +1,135 @@
+# Base image
+FROM nvidia/cuda:11.2.2-devel-ubuntu20.04
+
+# Defined only while building
+ARG DEBIAN_FRONTEND=noninteractive
+
+# TZ Data available at runtime
+ENV TZ="America/New_York"
+# Will make python ignore some warnings for docker
+ENV PYTHONUNBUFFERED=1
+# Clang version
+ENV CLANG_VERSION="7"
+ENV LLD_VERSION="7"
+# Mold version
+ENV MOLD_VERSION="1.5.1"
+# OpenMPI
+ENV OPENMPI_VERSION="4.1"
+ENV OPENMPI_MINOR_VERSION="2"
+
+# OpenCL™ 2.0 Driver for Intel® HD, Iris™, and Iris™ Pro Graphics for Linux* (64-bit)
+ENV INTEL_DRIVER_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/15532/l_opencl_p_18.1.0.015.tgz
+# Intel® SDK for OpenCL™ Applications 2016 R2 for Linux* (64 bit)
+ENV INTEL_SDK_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/17206/intel_sdk_for_opencl_applications_2020.3.494.tar.gz
+
+# Fix for https://stackoverflow.com/questions/72051754/apt-update-in-azure-nvidia-gives-publickey-error
+RUN apt-key del 7fa2af80
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+# wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
+COPY cuda-keyring_1.0-1_all.deb cuda-keyring_1.0-1_all.deb
+RUN dpkg -i cuda-keyring_1.0-1_all.deb
+
+# Install os dependencies and pip3
+RUN apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* && update-ca-certificates && apt-get update -y
+RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip -y
+RUN apt-get install nvidia-driver-460 cuda-drivers-460 intel-opencl-icd nvidia-cuda-toolkit opencl-headers clinfo -y
+RUN apt-get install doxygen binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${LLD_VERSION} lld -y
+RUN apt-get install libxml2-dev linux-headers-generic libopenmpi-dev libxslt-dev mpi mpich -y
+RUN ln -sf python3 /usr/bin/python
+
+RUN wget -q -O- https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz | sudo tar -C /usr/local --strip-components=1 -xzf - && \
+    sudo ln -sf /usr/local/bin/mold $(realpath /usr/bin/ld)
+
+# Setup pip and requirements
+RUN pip3 install --no-cache --upgrade pip setuptools
+RUN pip3 install --no-cache cpplint
+
+RUN ln -sf /usr/bin/clang /usr/bin/cc
+RUN ln -sf /usr/bin/clang++ /usr/bin/c++
+
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang 10
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 10
+RUN update-alternatives --install /usr/bin/ld ld /usr/bin/lld 10
+
+# Use python3 instead of python(2)
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+
+RUN update-alternatives --auto cc
+RUN update-alternatives --auto c++
+RUN update-alternatives --auto ld
+
+WORKDIR /home/
+
+## OpenMPI
+RUN wget https://download.open-mpi.org/release/open-mpi/v${OPENMPI_VERSION}/openmpi-${OPENMPI_VERSION}.${OPENMPI_MINOR_VERSION}.tar.gz
+RUN tar xzvf openmpi-${OPENMPI_VERSION}.${OPENMPI_MINOR_VERSION}.tar.gz
+
+WORKDIR openmpi-${OPENMPI_VERSION}.${OPENMPI_MINOR_VERSION}
+
+## Configure and install
+RUN ./configure CFLAGS=-O3 CXXFLAGS=-O3 --sysconfdir=/mnt/0 --prefix=/opt/openmpi --disable-silent-rules --enable-mpi-cxx --with-devel-headers --enable-binaries
+RUN make -j12
+RUN make install
+RUN ldconfig
+
+# Fix for: Cannot open configuration file /usr/share/openmpi/share/openmpi/mpicxx.openmpi-wrapper-data.txt
+# Error parsing data file mpicxx.openmpi: Not found
+# See: http://www.open-mpi.org/faq/?category=building#installdirs
+ENV OPAL_PREFIX="/opt/openmpi"
+ENV PATH="$PATH:/opt/openmpi/bin"
+ENV LD_LIBRARY_PATH="/opt/openmpi/lib"
+# export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/openmpi/lib:/usr/lib:/usr/lib/x86_64-linux-gnu"
+
+WORKDIR /opt/openmpi/share/openmpi
+
+RUN ln -s mpiCC-wrapper-data.txt mpiCC.openmpi-wrapper-data.txt
+RUN ln -s mpic++-wrapper-data.txt mpic++.openmpi-wrapper-data.txt
+RUN ln -s mpicc-wrapper-data.txt mpicc.openmpi-wrapper-data.txt
+RUN ln -s mpicxx-wrapper-data.txt mpicxx.openmpi-wrapper-data.txt
+RUN ln -s mpicxx-wrapper-data.txt mpif77.openmpi-wrapper-data.txt
+RUN ln -s mpif90-wrapper-data.txt mpif90.openmpi-wrapper-data.txt
+
+# Print version information
+RUN mpicc -show
+RUN mpiexec --version
+RUN mpicxx.openmpi --version
+
+# Run MPI hello.c test
+WORKDIR /home/
+RUN mkdir OpenMPi
+WORKDIR /home/OpenMPi
+
+RUN wget https://www.open-mpi.org/papers/workshop-2006/hello.c
+RUN mpicc hello.c -o hello
+RUN mpirun --allow-run-as-root -np 4 ./hello
+
+WORKDIR /tmp
+
+RUN wget https://github.com/intel/compute-runtime/releases/download/22.09.22577/intel-gmmlib_22.0.2_amd64.deb
+RUN wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.10409/intel-igc-core_1.0.10409_amd64.deb
+RUN wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.10409/intel-igc-opencl_1.0.10409_amd64.deb
+RUN wget https://github.com/intel/compute-runtime/releases/download/22.09.22577/intel-opencl-icd_22.09.22577_amd64.deb
+RUN wget https://github.com/intel/compute-runtime/releases/download/22.09.22577/intel-level-zero-gpu_1.3.22577_amd64.deb
+
+RUN dpkg -i *.deb
+
+RUN echo 'ACCEPT_EULA=accept \n\
+ACTIVATION_TYPE=no_license \n\
+INSTALL_MODE=NONRPM \n\
+CONTINUE_WITH_OPTIONAL_ERROR=yes \n\
+PSET_INSTALL_DIR=/opt \n\
+CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes \n\
+COMPONENTS=DEFAULTS \n\
+PSET_MODE=install' > silent_install.cfg
+
+RUN wget ${INTEL_SDK_URL}
+
+# Install SDK
+RUN TARBALL=$(basename ${INTEL_SDK_URL}) \
+ && DIR=$(basename ${INTEL_SDK_URL} .tar.gz) \
+ && tar zxvf ${TARBALL} \
+ && cd ${DIR} && ./install.sh --silent ../silent_install.cfg
+
+# Set our working directory
+WORKDIR /workdir
