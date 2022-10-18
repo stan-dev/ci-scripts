@@ -32,12 +32,16 @@ RUN dpkg -i cuda-keyring_1.0-1_all.deb
 
 # Install os dependencies and pip3
 RUN apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* && update-ca-certificates && apt-get update -y
-RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip -y
+RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip software-properties-common -y
 RUN apt-get install nvidia-driver-460 cuda-drivers-460 intel-opencl-icd nvidia-cuda-toolkit opencl-headers clinfo -y
 RUN apt-get install doxygen binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${LLD_VERSION} lld -y
 RUN apt-get install libxml2-dev linux-headers-generic libopenmpi-dev libxslt-dev mpi mpich -y
 RUN ln -sf python3 /usr/bin/python
 
+# Install brew
+RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install mold
 RUN wget -q -O- https://github.com/rui314/mold/releases/download/v$MOLD_VERSION/mold-$MOLD_VERSION-x86_64-linux.tar.gz | sudo tar -C /usr/local --strip-components=1 -xzf - && \
     sudo ln -sf /usr/local/bin/mold $(realpath /usr/bin/ld)
 
@@ -130,6 +134,14 @@ RUN TARBALL=$(basename ${INTEL_SDK_URL}) \
  && DIR=$(basename ${INTEL_SDK_URL} .tar.gz) \
  && tar zxvf ${TARBALL} \
  && cd ${DIR} && ./install.sh --silent ../silent_install.cfg
+
+# Install GCC-12 using BREW
+RUN eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" && \
+    echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile && \
+    brew install gcc@12 && gcc --version
+
+# Set GCC-12 as the default version
+RUN sudo update-alternatives --install /usr/bin/gcc gcc /home/linuxbrew/.linuxbrew/Cellar/gcc/12.2.0/bin/gcc-12 60 --slave /usr/bin/g++ g++ /home/linuxbrew/.linuxbrew/Cellar/gcc/12.2.0/bin/g++-12
 
 # Set our working directory
 WORKDIR /workdir
