@@ -9,7 +9,7 @@ ENV STANC3_ORG_ENV=${STANC3_ORG}
 
 # Update repositories and install OS deps
 RUN apt-get update
-RUN apt-get install opam curl bzip2 git tar curl ca-certificates openssl m4 bash -y
+RUN apt-get install build-essential file opam curl bzip2 git tar curl ca-certificates openssl m4 bash -y
 
 RUN update-ca-certificates -f
 

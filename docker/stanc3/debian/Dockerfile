@@ -12,7 +12,7 @@ ENV OPAMROOT /usr/local/opam
 # Install OS dependencies
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     curl ca-certificates \
-    rsync git build-essential m4 unzip pkg-config libpcre3-dev \
+    rsync git build-essential file m4 unzip pkg-config libpcre3-dev \
     python3 python3-pip nodejs sudo
 
 RUN addgroup -gid ${PGID} jenkins

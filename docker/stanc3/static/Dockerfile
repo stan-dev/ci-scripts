@@ -15,7 +15,7 @@ RUN addgroup -g ${PGID} jenkins && \
 LABEL distro_style="apk"
 
 #Install os dependencies
-RUN apk update && apk --no-cache add build-base bzip2 git tar curl ca-certificates openssl m4 bash docker jq git-subtree
+RUN apk update && apk --no-cache add build-base file bzip2 git tar curl ca-certificates openssl m4 bash docker jq git-subtree
 
 # Add a recent version of the Skopeo package, which is used for looking up the correct multiarch docker image
 # http://dl-cdn.alpinelinux.org/alpine/v3.14/community/aarch64/containers-common-0.38.11-r0.apk
