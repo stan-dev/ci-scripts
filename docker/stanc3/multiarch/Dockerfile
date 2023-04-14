@@ -1,5 +1,5 @@
 # Base image
-FROM debian:buster-slim
+FROM debian:buster-20211115-slim
 
 ARG STANC3_BRANCH=master
 ENV STANC3_BRANCH_ENV=${STANC3_BRANCH}

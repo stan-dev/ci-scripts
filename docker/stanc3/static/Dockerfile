@@ -19,8 +19,8 @@ RUN apk update && apk --no-cache add build-base file bzip2 git tar curl ca-certi
 
 # Add a recent version of the Skopeo package, which is used for looking up the correct multiarch docker image
 # http://dl-cdn.alpinelinux.org/alpine/v3.14/community/aarch64/containers-common-0.38.11-r0.apk
-RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/containers-common-0.44.3-r0.apk -o cont.apk && \
-    curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/skopeo-1.5.2-r0.apk -o skopeo.apk && \
+RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/containers-common-0.50.1-r0.apk -o cont.apk && \
+    curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/skopeo-1.10.0-r5.apk -o skopeo.apk && \
     apk add cont.apk && \
     apk add skopeo.apk
 
@@ -45,4 +45,4 @@ ENTRYPOINT [ "opam", "config", "exec", "--" ]
 
 # Build with:
 # cd stanc3
-# docker build -t stanorg/stanc3:staticfi --build-arg PUID=990 --progress=plain --build-arg PGID=986 -f ../ci-scripts/docker/stanc3/static/Dockerfile .
+# docker build -t stanorg/stanc3:staticfi-v0.0.2 --build-arg PUID=990 --progress=plain --build-arg PGID=986 -f ../ci-scripts/docker/stanc3/static/Dockerfile .
