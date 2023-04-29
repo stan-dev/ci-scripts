@@ -5,9 +5,9 @@ import org.stan.Utils
 def runTests(String testPath, boolean jumbo = false) {
     try {
         if (jumbo && !params.disableJumbo) {
-            sh "python3 runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
+            sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
         } else {
-            sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
+            sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath}"
         }
     }
         finally { junit 'test/**/*.xml' }
