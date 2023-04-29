@@ -100,6 +100,7 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
+                            ls -lhart
                             export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                             export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                             echo CXXFLAGS += -fsanitize=address >> make/local
@@ -120,6 +121,7 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
+                            ls -lhart
                             export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                             export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                             echo CXXFLAGS += -fsanitize=address >> make/local
@@ -147,6 +149,7 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
+                            ls -lhart
                             export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                             export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                             echo CXXFLAGS += -fsanitize=address >> make/local
@@ -171,6 +174,7 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
+                            ls -lhart
                             export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                             export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                             echo CXXFLAGS += -fsanitize=address >> make/local
