@@ -74,7 +74,7 @@ pipeline {
                     sh """
                         git clone https://github.com/stan-dev/math.git
                         cd math
-                        git clean -xffd"
+                        git clean -xffd
                     """
                     stash 'MathSetup'
                 }
