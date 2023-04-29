@@ -64,7 +64,7 @@ pipeline {
         stage('Prepare math') {
             agent {
                 docker {
-                    image 'docker pull alpine/git'
+                    image 'alpine/git'
                     label 'linux'
                 }
             }
