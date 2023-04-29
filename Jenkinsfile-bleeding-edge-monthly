@@ -24,6 +24,7 @@ pipeline {
     }
     parameters {
         booleanParam(defaultValue: false, name: 'disableJumbo', description: 'Disable Jumbo tests. This takes longer and should only be used for debugging if it is believed that the jumbo tests are causing failures.')
+        booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
     }
     environment {
         STAN_NUM_THREADS = 4
@@ -32,6 +33,12 @@ pipeline {
     }
     stages {
         stage('Build and push docker image') {
+            when {
+                beforeAgent true
+                expression {
+                    params.buildDocker
+                }
+            }
             agent {
                 docker {
                     image 'stanorg/stanc3:staticfi'
@@ -57,7 +64,7 @@ pipeline {
         stage('Prepare math') {
             agent {
                 docker {
-                    image 'stanorg/ci:bleeding-edge-compilers'
+                    image 'docker pull alpine/git'
                     label 'linux'
                 }
             }
