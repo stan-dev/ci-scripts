@@ -4,7 +4,7 @@ import org.stan.Utils
 
 def runTests(String testPath, boolean jumbo = false) {
     try {
-        sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath}"
+        sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
     }
     finally { junit 'test/**/*.xml' }
 }
@@ -94,14 +94,16 @@ pipeline {
                     }
                     steps {
                         unstash 'MathSetup'
-                        sh """
-                            cd math
-                            export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                            export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
-                            echo CXXFLAGS += -fsanitize=address >> make/local
-                            echo CXXFLAGS += -stdlib=libc++ >> make/local
-                            ./runTests.py -j${PARALLEL} --changed --debug
-                        """
+                        dir('math') {
+                            sh """
+                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
+                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS += -stdlib=libc++ >> make/local
+                                ./runTests.py -j${PARALLEL} --changed --debug
+                            """
+                        }
+
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
@@ -115,21 +117,23 @@ pipeline {
                     }
                     steps {
                         unstash 'MathSetup'
-                        sh """
-                            cd math
-                            export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                            export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
-                            echo CXXFLAGS += -fsanitize=address >> make/local
-                            echo CXXFLAGS += -stdlib=libc++ >> make/local
-                        """
+                        dir('math') {
+                            sh """
+                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
+                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS += -stdlib=libc++ >> make/local
+                            """
 
-                        script {
-                            //Do we run it at 0 or 3 ?
-                            //sh "echo O=0 >> make/local"
+                            script {
+                                //Do we run it at 0 or 3 ?
+                                //sh "echo O=0 >> make/local"
 
-                            runTests("math/test/unit/math/rev")
-                            runTests("math/test/unit/math/fwd")
+                                runTests("test/unit/math/rev")
+                                runTests("test/unit/math/fwd")
+                            }
                         }
+
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
@@ -143,18 +147,20 @@ pipeline {
                     }
                     steps {
                         unstash 'MathSetup'
-                        sh """
-                            cd math
-                            export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                            export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
-                            echo CXXFLAGS += -fsanitize=address >> make/local
-                            echo CXXFLAGS += -stdlib=libc++ >> make/local
-                        """
-                        script {
-                            //Do we run it at 0 or 3 ?
-                            //sh "echo O=0 >> make/local"
-                            runTests("math/test/unit/math/mix", true)
+                        dir('math') {
+                            sh """
+                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
+                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS += -stdlib=libc++ >> make/local
+                            """
+                            script {
+                                //Do we run it at 0 or 3 ?
+                                //sh "echo O=0 >> make/local"
+                                runTests("test/unit/math/mix", true)
+                            }
                         }
+
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
@@ -168,21 +174,23 @@ pipeline {
                     }
                     steps {
                         unstash 'MathSetup'
-                        sh """
-                            cd math
-                            export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                            export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
-                            echo CXXFLAGS += -fsanitize=address >> make/local
-                            echo CXXFLAGS += -stdlib=libc++ >> make/local
-                        """
-                        script {
-                            //Do we run it at 0 or 3 ?
-                            //sh "echo O=0 >> make/local"
-                            runTests("math/test/unit/*_test.cpp", false)
-                            runTests("math/test/unit/math/*_test.cpp", false)
-                            runTests("math/test/unit/math/prim", true)
-                            runTests("math/test/unit/math/memory", false)
+                        dir('math') {
+                            sh """
+                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
+                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS += -stdlib=libc++ >> make/local
+                            """
+                            script {
+                                //Do we run it at 0 or 3 ?
+                                //sh "echo O=0 >> make/local"
+                                runTests("test/unit/*_test.cpp", false)
+                                runTests("test/unit/math/*_test.cpp", false)
+                                runTests("test/unit/math/prim", true)
+                                runTests("test/unit/math/memory", false)
+                            }
                         }
+
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
