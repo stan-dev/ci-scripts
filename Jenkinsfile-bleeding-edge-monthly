@@ -100,7 +100,7 @@ pipeline {
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                                 export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                                 echo CXXFLAGS += -fsanitize=address >> make/local
-                                ./runTests.py -j${PARALLEL} --changed --debug
+                                python3 runTests.py -j${PARALLEL} --changed --debug
                             """
                         }
 
