@@ -2,6 +2,7 @@
 @Library('StanUtils')
 import org.stan.Utils
 
+// How do we pass -stdlib=libc++
 def runTests(String testPath, boolean jumbo = false) {
     try {
         sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
@@ -99,7 +100,6 @@ pipeline {
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                                 export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                                 echo CXXFLAGS += -fsanitize=address >> make/local
-                                echo CXXFLAGS += -stdlib=libc++ >> make/local
                                 ./runTests.py -j${PARALLEL} --changed --debug
                             """
                         }
@@ -122,7 +122,6 @@ pipeline {
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                                 export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                                 echo CXXFLAGS += -fsanitize=address >> make/local
-                                echo CXXFLAGS += -stdlib=libc++ >> make/local
                             """
 
                             script {
@@ -152,7 +151,6 @@ pipeline {
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                                 export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                                 echo CXXFLAGS += -fsanitize=address >> make/local
-                                echo CXXFLAGS += -stdlib=libc++ >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
@@ -179,7 +177,6 @@ pipeline {
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
                                 export GCC="g++-\$(cat /tmp/gcc-major-version.txt)"
                                 echo CXXFLAGS += -fsanitize=address >> make/local
-                                echo CXXFLAGS += -stdlib=libc++ >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
