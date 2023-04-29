@@ -1,0 +1,210 @@
+#!/usr/bin/env groovy
+@Library('StanUtils')
+import org.stan.Utils
+
+def runTests(String testPath, boolean jumbo = false) {
+    try {
+        if (jumbo && !params.disableJumbo) {
+            sh "python3 runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
+        } else {
+            sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
+        }
+    }
+        finally { junit 'test/**/*.xml' }
+}
+
+def utils = new org.stan.Utils()
+
+pipeline {
+    agent none
+    options {
+        skipDefaultCheckout()
+        preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
+    }
+    parameters {
+        booleanParam(defaultValue: false, name: 'disableJumbo', description: 'Disable Jumbo tests. This takes longer and should only be used for debugging if it is believed that the jumbo tests are causing failures.')
+    }
+    environment {
+        STAN_NUM_THREADS = 4
+        N_TESTS = 100
+        PARALLEL = 4
+    }
+    stages {
+
+        stage('Kill previous builds') {
+            steps {
+                script {
+                    utils.killOldBuilds()
+                }
+            }
+        }
+
+        stage('Build and push docker image') {
+            agent {
+                docker {
+                    image 'stanorg/stanc3:staticfi'
+                    label 'linux'
+                    args "--group-add=987 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
+            environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
+            steps {
+                script {
+                    retry(3) { checkout scm }
+                    sh """
+                        cd docker/bleeding-edge-compilers
+                        docker build -t stanorg/ci:bleeding-edge-compilers .
+                        docker login --username stanorg --password "${DOCKER_TOKEN}"
+                        docker push stanorg/ci:bleeding-edge-compilers
+                    """
+                }
+            }
+        }
+
+
+        stage('Prepare math') {
+            agent {
+                docker {
+                    image 'stanorg/ci:bleeding-edge-compilers'
+                    label 'linux'
+                }
+            }
+            steps {
+                script {
+                    sh """
+                        git clone https://github.com/stan-dev/math.git
+                        cd math
+                        git clean -xffd"
+                    """
+                    stash 'MathSetup'
+                }
+            }
+            post {
+                always {
+                    deleteDir()
+                }
+            }
+        }
+
+        stage('Quick tests') {
+            failFast true
+            stage('Run changed unit tests') {
+                agent {
+                    docker {
+                        image 'stanorg/ci:bleeding-edge-compilers'
+                        label 'linux'
+                        args '--cap-add SYS_PTRACE'
+                    }
+                }
+                steps {
+                    unstash 'MathSetup'
+                    sh """
+                        export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
+                        export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                        echo CXXFLAGS += -fsanitize=address >> make/local
+                        echo CXXFLAGS += -stdlib=libc++ >> make/local
+                        ./runTests.py -j${PARALLEL} --changed --debug
+                    """
+                }
+                post { always { retry(3) { deleteDir() } } }
+            }
+        }
+
+        stage('Full Unit Tests') {
+            failFast true
+            parallel {
+                stage('Rev/Fwd Unit Tests') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        sh """
+                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            echo CXXFLAGS += -fsanitize=address >> make/local
+                            echo CXXFLAGS += -stdlib=libc++ >> make/local
+                        """
+
+                        script {
+                            //Do we run it at 0 or 3 ?
+                            //sh "echo O=0 >> make/local"
+
+                            runTests("test/unit/math/rev")
+                            runTests("test/unit/math/fwd")
+                        }
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Mix Unit Tests') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        sh """
+                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            echo CXXFLAGS += -fsanitize=address >> make/local
+                            echo CXXFLAGS += -stdlib=libc++ >> make/local
+                        """
+                        script {
+                            //Do we run it at 0 or 3 ?
+                            //sh "echo O=0 >> make/local"
+                            runTests("test/unit/math/mix", true)
+                        }
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Prim Unit Tests') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        sh """
+                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            echo CXXFLAGS += -fsanitize=address >> make/local
+                            echo CXXFLAGS += -stdlib=libc++ >> make/local
+                        """
+                        script {
+                            //Do we run it at 0 or 3 ?
+                            //sh "echo O=0 >> make/local"
+                            runTests("test/unit/*_test.cpp", false)
+                            runTests("test/unit/math/*_test.cpp", false)
+                            runTests("test/unit/math/prim", true)
+                            runTests("test/unit/math/memory", false)
+                        }
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+            }
+        }
+
+    }
+
+    post {
+        always {
+            node("linux") {
+                recordIssues enabledForFailure: false, tool: clang()
+            }
+        }
+        // success { script { utils.mailBuildResults("SUCCESSFUL") } }
+        // unstable { script { utils.mailBuildResults("UNSTABLE") } }
+        // failure { script { utils.mailBuildResults("FAILURE") } }
+    }
+}
