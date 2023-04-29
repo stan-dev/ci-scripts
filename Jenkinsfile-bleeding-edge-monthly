@@ -132,8 +132,8 @@ pipeline {
                             //Do we run it at 0 or 3 ?
                             //sh "echo O=0 >> make/local"
 
-                            runTests("test/unit/math/rev")
-                            runTests("test/unit/math/fwd")
+                            runTests("math/test/unit/math/rev")
+                            runTests("math/test/unit/math/fwd")
                         }
                     }
                     post { always { retry(3) { deleteDir() } } }
@@ -158,7 +158,7 @@ pipeline {
                         script {
                             //Do we run it at 0 or 3 ?
                             //sh "echo O=0 >> make/local"
-                            runTests("test/unit/math/mix", true)
+                            runTests("math/test/unit/math/mix", true)
                         }
                     }
                     post { always { retry(3) { deleteDir() } } }
@@ -183,10 +183,10 @@ pipeline {
                         script {
                             //Do we run it at 0 or 3 ?
                             //sh "echo O=0 >> make/local"
-                            runTests("test/unit/*_test.cpp", false)
-                            runTests("test/unit/math/*_test.cpp", false)
-                            runTests("test/unit/math/prim", true)
-                            runTests("test/unit/math/memory", false)
+                            runTests("math/test/unit/*_test.cpp", false)
+                            runTests("math/test/unit/math/*_test.cpp", false)
+                            runTests("math/test/unit/math/prim", true)
+                            runTests("math/test/unit/math/memory", false)
                         }
                     }
                     post { always { retry(3) { deleteDir() } } }
