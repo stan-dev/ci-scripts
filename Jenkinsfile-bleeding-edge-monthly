@@ -100,8 +100,8 @@ pipeline {
                 steps {
                     unstash 'MathSetup'
                     sh """
-                        export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
-                        export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                        export CLANG_CXX = "clang++-\$(cat /tmp/clang-major-version.txt)"
+                        export GCC = 'g++-\$(cat /tmp/gcc-major-version.txt)'
                         echo CXXFLAGS += -fsanitize=address >> make/local
                         echo CXXFLAGS += -stdlib=libc++ >> make/local
                         ./runTests.py -j${PARALLEL} --changed --debug
@@ -125,8 +125,8 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
-                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
-                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            export CLANG_CXX = "clang++-\$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-\$(cat /tmp/gcc-major-version.txt)'
                             echo CXXFLAGS += -fsanitize=address >> make/local
                             echo CXXFLAGS += -stdlib=libc++ >> make/local
                         """
@@ -152,8 +152,8 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
-                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
-                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            export CLANG_CXX = "clang++-\$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-\$(cat /tmp/gcc-major-version.txt)'
                             echo CXXFLAGS += -fsanitize=address >> make/local
                             echo CXXFLAGS += -stdlib=libc++ >> make/local
                         """
@@ -176,8 +176,8 @@ pipeline {
                     steps {
                         unstash 'MathSetup'
                         sh """
-                            export CLANG_CXX = "clang++-$(cat /tmp/clang-major-version.txt)"
-                            export GCC = 'g++-$(cat /tmp/gcc-major-version.txt)'
+                            export CLANG_CXX = "clang++-\$(cat /tmp/clang-major-version.txt)"
+                            export GCC = 'g++-\$(cat /tmp/gcc-major-version.txt)'
                             echo CXXFLAGS += -fsanitize=address >> make/local
                             echo CXXFLAGS += -stdlib=libc++ >> make/local
                         """
