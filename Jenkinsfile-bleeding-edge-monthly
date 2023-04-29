@@ -4,13 +4,9 @@ import org.stan.Utils
 
 def runTests(String testPath, boolean jumbo = false) {
     try {
-        if (jumbo && !params.disableJumbo) {
-            sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
-        } else {
-            sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath}"
-        }
+        sh "python3 math/runTests.py -j${env.PARALLEL} ${testPath}"
     }
-        finally { junit 'test/**/*.xml' }
+    finally { junit 'test/**/*.xml' }
 }
 
 def utils = new org.stan.Utils()
@@ -23,7 +19,6 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     parameters {
-        booleanParam(defaultValue: false, name: 'disableJumbo', description: 'Disable Jumbo tests. This takes longer and should only be used for debugging if it is believed that the jumbo tests are causing failures.')
         booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
     }
     environment {
