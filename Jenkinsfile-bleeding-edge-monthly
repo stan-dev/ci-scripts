@@ -31,15 +31,6 @@ pipeline {
         PARALLEL = 4
     }
     stages {
-
-        stage('Kill previous builds') {
-            steps {
-                script {
-                    utils.killOldBuilds()
-                }
-            }
-        }
-
         stage('Build and push docker image') {
             agent {
                 docker {
