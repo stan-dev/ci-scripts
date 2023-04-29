@@ -66,6 +66,7 @@ pipeline {
                 docker {
                     image 'alpine/git'
                     label 'linux'
+                    args "--entrypoint=\'\'"
                 }
             }
             steps {
