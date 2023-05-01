@@ -38,7 +38,3 @@ RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq 
     # Set gcc and g++ to latest version
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"${major}" "${major}" && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"${major}" "${major}"
-
-
-#########
-cmake -G Ninja -S runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind"
