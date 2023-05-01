@@ -2,7 +2,7 @@
 @Library('StanUtils')
 import org.stan.Utils
 
-// How do we pass -stdlib=libc++
+// How do we pass 
 def runTests(String testPath, boolean jumbo = false) {
     try {
         sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
@@ -99,7 +99,8 @@ pipeline {
                         dir('math') {
                             sh """
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                                 python3 runTests.py -j${PARALLEL} --changed --debug
                             """
                         }
@@ -120,7 +121,8 @@ pipeline {
                         dir('math') {
                             sh """
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
 
                             script {
@@ -148,7 +150,8 @@ pipeline {
                         dir('math') {
                             sh """
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
@@ -173,7 +176,8 @@ pipeline {
                         dir('math') {
                             sh """
                                 export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS += -fsanitize=address >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
