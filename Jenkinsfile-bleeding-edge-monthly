@@ -98,7 +98,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo CXX="clang++-\$(cat /tmp/clang-major-version.txt)" >> make/local
+                                echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                                 python3 runTests.py -j${PARALLEL} --changed --debug
@@ -120,7 +120,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo CXX="clang++-\$(cat /tmp/clang-major-version.txt)" >> make/local
+                                echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
@@ -149,7 +149,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo CXX="clang++-\$(cat /tmp/clang-major-version.txt)" >> make/local
+                                echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
@@ -175,7 +175,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo CXX="clang++-\$(cat /tmp/clang-major-version.txt)" >> make/local
+                                echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
