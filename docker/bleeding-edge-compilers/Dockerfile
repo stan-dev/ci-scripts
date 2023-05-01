@@ -2,7 +2,7 @@
 FROM ubuntu:lunar
 
 # Install OS depdencies
-RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common libc++-dev -y
+RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake ninja-build -y
 
 # Set our working dir to /tmp
 WORKDIR /tmp
@@ -15,6 +15,15 @@ RUN LATEST_RELEASE_ARCHIVE=$(curl -s https://api.github.com/repos/llvm/llvm-proj
     major=$(echo $LATEST_RELEASE | cut -d. -f1) && \
     echo "${major}" > clang-major-version.txt && \
     rm -rf llvm-clang-latest.tar.xz
+
+# Download the source code, build & install libcxx
+RUN git clone https://github.com/llvm/llvm-project.git && \
+    cd llvm-project && \
+    mkdir build && cd build && \
+    cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
+    ninja -C build cxx cxxabi unwind && \
+    ninja -C build check-cxx check-cxxabi check-unwind && \
+    ninja -C build install-cxx install-cxxabi install-unwind
 
 # Add latest clang,llvm to PATH
 ENV PATH="${PATH}:/tmp/llvm-clang-latest/bin"
@@ -29,3 +38,7 @@ RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq 
     # Set gcc and g++ to latest version
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"${major}" "${major}" && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"${major}" "${major}"
+
+
+#########
+cmake -G Ninja -S runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind"
