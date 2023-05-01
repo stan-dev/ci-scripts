@@ -16,6 +16,9 @@ RUN LATEST_RELEASE_ARCHIVE=$(curl -s https://api.github.com/repos/llvm/llvm-proj
     echo "${major}" > clang-major-version.txt && \
     rm -rf llvm-clang-latest.tar.xz
 
+# Add latest clang,llvm to PATH
+ENV PATH="${PATH}:/tmp/llvm-clang-latest/bin"
+
 # Download the source code, build & install libcxx
 RUN git clone https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
@@ -24,9 +27,6 @@ RUN git clone https://github.com/llvm/llvm-project.git && \
     ninja -C build cxx cxxabi unwind && \
     ninja -C build check-cxx check-cxxabi check-unwind && \
     ninja -C build install-cxx install-cxxabi install-unwind
-
-# Add latest clang,llvm to PATH
-ENV PATH="${PATH}:/tmp/llvm-clang-latest/bin"
 
 # Install latest gcc, g++ from ubuntu toolchain ppa
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
