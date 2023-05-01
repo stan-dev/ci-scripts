@@ -98,8 +98,8 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS="-fsanitize=address" >> make/local
+                                export CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                                 python3 runTests.py -j${PARALLEL} --changed --debug
                             """
@@ -120,8 +120,8 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS="-fsanitize=address" >> make/local
+                                export CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
 
@@ -149,8 +149,8 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS="-fsanitize=address" >> make/local
+                                export CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
@@ -175,8 +175,8 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                export CLANG_CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
-                                echo CXXFLAGS="-fsanitize=address" >> make/local
+                                export CXX="clang++-\$(cat /tmp/clang-major-version.txt)"
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
