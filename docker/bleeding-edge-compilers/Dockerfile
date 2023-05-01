@@ -2,7 +2,7 @@
 FROM ubuntu:lunar
 
 # Install OS depdencies
-RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common -y
+RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common libc++-dev -y
 
 # Set our working dir to /tmp
 WORKDIR /tmp
