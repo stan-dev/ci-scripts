@@ -54,6 +54,12 @@ pipeline {
                         docker login --username stanorg --password "${DOCKER_TOKEN}"
                         docker push stanorg/ci:bleeding-edge-compilers
                     """
+
+                }
+            }
+            post {
+                always {
+                    deleteDir()
                 }
             }
         }
@@ -70,6 +76,7 @@ pipeline {
             steps {
                 script {
                     sh """
+                        rm -rf math
                         git clone https://github.com/stan-dev/math.git
                         cd math
                         git checkout ${params.mathBranch}
