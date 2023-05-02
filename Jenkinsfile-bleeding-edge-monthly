@@ -13,7 +13,7 @@ def runTests(String testPath, boolean jumbo = false) {
 def setupMakeLocal() {
     // When ready, change O=3
     sh """
-        sh "echo O=0 >> make/local"
+        echo O=0 >> make/local
         echo CXX="clang++" >> make/local
         echo CPPFLAGS="-I/usr/local/include/c++/v1" >> make/local
         echo CXXFLAGS="-fsanitize=address -stdlib=libc++" >> make/local
