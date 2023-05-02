@@ -107,7 +107,6 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo LD_LIBRARY_PATH=/usr/local/lib:\$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
@@ -130,9 +129,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo LD_LIBRARY_PATH=/usr/local/lib:\$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
 
                             script {
@@ -159,9 +158,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo LD_LIBRARY_PATH="/usr/local/lib:\$LD_LIBRARY_PATH" >> make/local
                                 echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
@@ -185,9 +184,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
-                                echo LD_LIBRARY_PATH=/usr/local/lib:\$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
                                 echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
