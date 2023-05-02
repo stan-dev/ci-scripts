@@ -108,7 +108,7 @@ pipeline {
                         dir('math') {
                             sh """
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                                 python3 runTests.py -j${PARALLEL} --changed --debug
                             """
@@ -130,7 +130,7 @@ pipeline {
                         dir('math') {
                             sh """
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
 
@@ -159,7 +159,7 @@ pipeline {
                         dir('math') {
                             sh """
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {
@@ -185,7 +185,7 @@ pipeline {
                         dir('math') {
                             sh """
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                             """
                             script {

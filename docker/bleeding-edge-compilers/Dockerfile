@@ -24,6 +24,9 @@ RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq 
 RUN addgroup -gid ${PGID} jenkins
 RUN adduser --disabled-password --gecos '' --ingroup jenkins --uid ${PUID} jenkins
 
+RUN chown -R jenkins:jenkins /usr/local
+RUN chown -f -R jenkins:jenkins /etc || true
+
 USER jenkins
 WORKDIR /home/jenkins
 
@@ -37,7 +40,7 @@ RUN LATEST_RELEASE_ARCHIVE=$(curl -s https://api.github.com/repos/llvm/llvm-proj
     rm -rf llvm-clang-latest.tar.xz
 
 # Add latest clang,llvm to PATH
-ENV PATH="/tmp/llvm-clang-latest/bin:${PATH}"
+ENV PATH="/home/jenkins/llvm-clang-latest/bin:${PATH}"
 
 # Download the source code, build & install libcxx
 RUN git clone https://github.com/llvm/llvm-project.git && \
