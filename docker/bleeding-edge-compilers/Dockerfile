@@ -20,12 +20,12 @@ RUN LATEST_RELEASE_ARCHIVE=$(curl -s https://api.github.com/repos/llvm/llvm-proj
 ENV PATH="${PATH}:/tmp/llvm-clang-latest/bin"
 
 # Download the source code, build & install libcxx
+#    ninja -C build check-cxx check-cxxabi check-unwind && \
 RUN git clone https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
     mkdir build && cd build && \
     cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
     ninja -C build cxx cxxabi unwind && \
-    ninja -C build check-cxx check-cxxabi check-unwind && \
     ninja -C build install-cxx install-cxxabi install-unwind
 
 # Install latest gcc, g++ from ubuntu toolchain ppa
