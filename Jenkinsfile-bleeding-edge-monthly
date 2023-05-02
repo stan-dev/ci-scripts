@@ -21,6 +21,7 @@ pipeline {
     }
     parameters {
         booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
+        string(defaultValue: 'develop', name: 'mathBranch', description: 'What match branch to clone')
     }
     environment {
         STAN_NUM_THREADS = 4
@@ -71,6 +72,7 @@ pipeline {
                     sh """
                         git clone https://github.com/stan-dev/math.git
                         cd math
+                        git checkout ${params.mathBranch}
                         git clean -xffd
                     """
                     stash 'MathSetup'
@@ -98,8 +100,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
+                                echo LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -Wl,-rpath,/usr/local/lib" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
                                 echo LDFLAGS="-stdlib=libc++" >> make/local
                                 python3 runTests.py -j${PARALLEL} --changed --debug
                             """
@@ -120,9 +123,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
+                                echo LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -Wl,-rpath,/usr/local/lib" >> make/local
-                                echo LDFLAGS="-stdlib=libc++" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
                             """
 
                             script {
@@ -149,9 +152,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
+                                echo LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -Wl,-rpath,/usr/local/lib" >> make/local
-                                echo LDFLAGS="-stdlib=libc++" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
@@ -175,9 +178,9 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             sh """
+                                echo LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH >> make/local
                                 echo CXX="clang++" >> make/local
-                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -Wl,-rpath,/usr/local/lib" >> make/local
-                                echo LDFLAGS="-stdlib=libc++" >> make/local
+                                echo CXXFLAGS="-fsanitize=address -stdlib=libc++ -nostdinc++ -I/usr/local/include/c++/v1 -L/usr/local/lib" >> make/local
                             """
                             script {
                                 //Do we run it at 0 or 3 ?
