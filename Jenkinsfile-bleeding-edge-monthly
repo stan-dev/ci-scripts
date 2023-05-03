@@ -15,8 +15,8 @@ def setupMakeLocal() {
     sh """
         echo O=0 >> make/local
         echo CXX="clang++" >> make/local
-        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -isystem/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
-        echo CXXFLAGS="-fsanitize=address -nostdinc++ -nostdlib++ -isystem/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++" >> make/local
+        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -isystem/usr/local/include/c++/v1 -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
+        echo CXXFLAGS="-fsanitize=address -nostdinc++ -nostdlib++ -isystem/usr/local/include/c++/v1 -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++" >> make/local
         echo LDFLAGS="isystem/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
     """
 }
