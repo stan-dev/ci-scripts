@@ -14,11 +14,12 @@ def setupMakeLocal() {
     // When ready, change O=3
     sh """
         echo O=0 >> make/local
+        echo CC="clang" >> make/local
         echo CXX="clang++" >> make/local
         echo CFLAGS="-stdlib=libc++" >> make/local
         echo CPPFLAGS="-nostdinc++ -nodefaultlibs -isystem/usr/local/include/c++/v1 -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
         echo CXXFLAGS="-fsanitize=address -nostdinc++ -nostdlib++ -isystem/usr/local/include/c++/v1 -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++" >> make/local
-        echo LDFLAGS="isystem/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib" >> make/local
+        echo LDFLAGS="isystem/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1 >> make/local
 
         cat make/local
     """
