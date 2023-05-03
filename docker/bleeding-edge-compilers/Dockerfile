@@ -15,7 +15,7 @@ RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential 
 RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq '.[]|select(.name | startswith("releases/gcc-"))' | jq '.name' | head -1 | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+') && \
     major=$(echo $LATEST_RELEASE | cut -d. -f1) && \
     add-apt-repository ppa:ubuntu-toolchain-r/test -y && apt-get update -y && apt-get install gcc-${major} g++-${major} -y && \
-    echo "${major}" > gcc-major-version.txt && \
+    echo "${major}" > gcc-major-version.txt && cat gcc-major-version.txt && \
     # Set gcc and g++ to latest version
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"${major}" "${major}" && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"${major}" "${major}"
@@ -36,8 +36,8 @@ RUN LATEST_RELEASE_ARCHIVE=$(curl -s https://api.github.com/repos/llvm/llvm-proj
     tar -xvf llvm-clang-latest.tar.xz && mv "clang+llvm"* llvm-clang-latest && \
     LATEST_RELEASE=$(echo $LATEST_RELEASE_ARCHIVE | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1) && \
     major=$(echo $LATEST_RELEASE | cut -d. -f1) && \
-    echo "${major}" > clang-major-version.txt && \
-    rm -rf llvm-clang-latest.tar.xz
+    echo "${major}" > clang-major-version.txt && cat clang-major-version.txt && \
+    rm -rf llvm-clang-latest.tar.xz 
 
 # Add latest clang,llvm to PATH
 ENV PATH="/home/jenkins/llvm-clang-latest/bin:${PATH}"
@@ -46,7 +46,7 @@ ENV PATH="/home/jenkins/llvm-clang-latest/bin:${PATH}"
 RUN git clone https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
     mkdir build && cd build && \
-    cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
+    cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;third-party;test-suite" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
     ninja -C build cxx cxxabi unwind && \
     ninja -C build check-cxx check-cxxabi check-unwind && \
     ninja -C build install-cxx install-cxxabi install-unwind && \
