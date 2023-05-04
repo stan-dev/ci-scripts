@@ -2,10 +2,13 @@
 @Library('StanUtils')
 import org.stan.Utils
 
-// How do we pass 
 def runTests(String testPath, boolean jumbo = false) {
     try {
-        sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
+        if (jumbo && !params.disableJumbo) {
+            sh "python3 runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
+        } else {
+            sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
+        }
     }
     finally { junit 'test/**/*.xml' }
 }
