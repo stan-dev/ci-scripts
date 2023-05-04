@@ -20,9 +20,9 @@ def setupMakeLocal() {
         echo CC="clang" >> make/local
         echo CXX="clang++" >> make/local
         echo CFLAGS="-stdlib=libc++" >> make/local
-        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
-        echo CXXFLAGS="-fsanitize=address -nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++" >> make/local
-        echo LDFLAGS="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1" >> make/local
+        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1" >> make/local
+        echo CXXFLAGS="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -fsanitize=address" >> make/local
+        echo LDFLAGS="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
     """
 }
 
