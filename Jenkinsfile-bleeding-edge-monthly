@@ -17,11 +17,9 @@ def setupMakeLocal() {
         echo CC="clang" >> make/local
         echo CXX="clang++" >> make/local
         echo CFLAGS="-stdlib=libc++" >> make/local
-        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
-        echo CXXFLAGS="-fsanitize=address -nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++" >> make/local
-        echo LDFLAGS="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1" >> make/local
-
-        cat make/local
+        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1" >> make/local
+        echo CXXFLAGS="-fsanitize=address" >> make/local
+        echo LDFLAGS="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1 -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc" >> make/local
     """
 }
 
@@ -110,24 +108,6 @@ pipeline {
         stage('Full Unit Tests') {
             failFast true
             parallel {
-                stage('Run changed unit tests') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script{ setupMakeLocal() }
-                            sh "python3 runTests.py -j${PARALLEL} --changed --debug"
-                        }
-
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
                 stage('Rev/Fwd Unit Tests') {
                     agent {
                         docker {
