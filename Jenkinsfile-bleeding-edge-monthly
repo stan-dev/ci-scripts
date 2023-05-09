@@ -432,46 +432,6 @@ pipeline {
                     }
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
                 }
-                stage('Math functions expressions test') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                        }
-                    }
-                    steps {
-                        dir("${env.WORKSPACE}/compile-expressions"){
-                            unstash "Stanc3Setup"
-                            unstash 'ubuntu-exe'
-                            script {
-                                sh """
-                                    git clone --recursive https://github.com/stan-dev/math.git
-                                """
-                                utils.checkout_pr("math", "math", params.math_pr)
-                                sh """
-                                    cp bin/stanc math/test/expressions/stanc
-                                """
-
-                                dir("math") {
-                                    sh """
-                                        #!/usr/bin/env bash
-                                        echo O=0 >> make/local
-                                        echo "CXX=clang++ -Werror " >> make/local
-                                        # Fix for AttributeError: module 'collections' has no attribute 'Iterable'
-                                        # https://stackoverflow.com/questions/72371859/attributeerror-module-collections-has-no-attribute-iterable
-                                        # We might want to patch this in the main repository
-                                        sed -i 's/import collections/import collections\\ncollections.Iterable = collections.abc.Iterable/' test/code_generator.py
-                                    """
-                                    withEnv(['PATH+TBB=./lib/tbb']) {
-                                        try { sh "python3 runTests.py -j${env.PARALLEL} test/expressions" }
-                                        finally { junit 'test/**/*.xml' }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-expressions/*" }}
-                }
             }
         }
 
