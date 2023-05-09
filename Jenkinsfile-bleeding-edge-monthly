@@ -303,35 +303,6 @@ pipeline {
             }
         }
 
-        stage('CmdStan Perf Tests') {
-            parallel {
-                stage("Numerical Accuracy and Performance Tests on Known-Good Models") {
-                    agent { label 'osx && intel' }
-                    steps {
-                        unstash "PerfSetup"
-                        setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
-                        sh "python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests"
-                        junit '*.xml'
-                        archiveArtifacts '*.xml'
-                }
-            }
-            stage('Shotgun Performance Regression Tests') {
-                agent {
-                    docker {
-                        image 'stanorg/ci:bleeding-edge-compilers'
-                        label 'linux'
-                        args '--pull always'
-                    }
-                }
-                steps {
-                    unstash "PerfSetup"
-                    setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
-                    sh "python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests "
-                }
-            }
-            }
-        }
-
         stage("CmdStan & Math tests") {
             parallel {
                 stage("Compile tests - good at O=1") {
@@ -432,6 +403,35 @@ pipeline {
                     }
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
                 }
+            }
+        }
+
+        stage('CmdStan Perf Tests') {
+            parallel {
+                stage("Numerical Accuracy and Performance Tests on Known-Good Models") {
+                    agent { label 'osx && intel' }
+                    steps {
+                        unstash "PerfSetup"
+                        setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                        sh "python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests"
+                        junit '*.xml'
+                        archiveArtifacts '*.xml'
+                }
+            }
+            stage('Shotgun Performance Regression Tests') {
+                agent {
+                    docker {
+                        image 'stanorg/ci:bleeding-edge-compilers'
+                        label 'linux'
+                        args '--pull always'
+                    }
+                }
+                steps {
+                    unstash "PerfSetup"
+                    setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                    sh "python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests "
+                }
+            }
             }
         }
 
