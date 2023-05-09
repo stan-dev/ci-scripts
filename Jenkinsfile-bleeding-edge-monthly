@@ -409,6 +409,7 @@ pipeline {
         stage('CmdStan Perf Tests') {
             parallel {
                 stage("Numerical Accuracy and Performance Tests on Known-Good Models") {
+                    // This will error out on MAC M1 architecture
                     agent { label 'osx && intel' }
                     steps {
                         unstash "PerfSetup"
