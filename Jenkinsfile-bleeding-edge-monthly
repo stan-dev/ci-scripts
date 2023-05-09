@@ -386,8 +386,7 @@ pipeline {
                                     cat all.tests
                                     echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
                                     cd cmdstan; make clean-all; git show HEAD --stat; cd ..
-                                    chmod +x runPerformanceTests.py
-                                    chmod +x compare-optimizer.sh
+                                    alias python="python3 "
                                     CXX="clang++" ./compare-optimizer.sh "--tests-file all.tests --num-samples=10" "--O1" "\$(readlink -f ../bin/stanc)"
                                 """
                             }
