@@ -388,11 +388,12 @@ pipeline {
                                     cat shotgun_perf_all.tests >> all.tests
                                     cat all.tests
                                     echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
-                                    cd cmdstan; make clean-all; git show HEAD --stat; cd ..
-                                    alias python="python3 "
-                                    dos2unix runPerformanceTests.py
-                                    chmod +x runPerformanceTests.py
-                                    CXX="clang++" ./compare-optimizer.sh "--tests-file all.tests --num-samples=10" "--O1" "\$(readlink -f ../bin/stanc)"
+                                    cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
+                                    rm bin/stanc
+                                    cp "\$(readlink -f ../bin/stanc)" bin/stanc
+                                    make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
+                                    echo "STANCFLAGS += --O1" >> cmdstan/make/local
+                                    CXX="clang++" python3 runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
                                 """
                             }
 
