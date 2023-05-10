@@ -393,7 +393,7 @@ pipeline {
                                     cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
                                     pwd
                                     rm bin/stanc
-                                    cp ../bin/stanc bin/stanc
+                                    cp ../../bin/stanc bin/stanc
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     CXX="clang++" python3 runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
