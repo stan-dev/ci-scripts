@@ -372,6 +372,7 @@ pipeline {
                             script {
                                 unstash "Stanc3Setup"
                                 unstash 'ubuntu-exe'
+                                sh "ls -lhart"
                                 sh """
                                     git clone --recursive --depth 50 https://github.com/stan-dev/performance-tests-cmdstan
                                 """
@@ -388,9 +389,11 @@ pipeline {
                                     cat shotgun_perf_all.tests >> all.tests
                                     cat all.tests
                                     echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
+                                    pwd
                                     cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
+                                    pwd
                                     rm bin/stanc
-                                    cp "\$(readlink -f ../bin/stanc)" bin/stanc
+                                    cp ../bin/stanc bin/stanc
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     CXX="clang++" python3 runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
