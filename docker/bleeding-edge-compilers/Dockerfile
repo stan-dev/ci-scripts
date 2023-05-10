@@ -7,7 +7,7 @@ ARG PUID
 ARG PGID
 
 # Install OS depdencies
-RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake ninja-build sudo -y
+RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake ninja-build sudo dos2unix -y
 
 # Install latest gcc, g++ from ubuntu toolchain ppa
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
