@@ -24,10 +24,10 @@ def setupMakeLocal(String o = "", String cc = "" , String cxx = "" , String cFla
         echo O="0 ${o}" >> ${makeLocalPath}
         echo CC="clang ${cc}" >> ${makeLocalPath}
         echo CXX="clang++ ${cxx}" >> ${makeLocalPath}
-        echo CFLAGS="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
-        echo CPPFLAGS="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
-        echo CXXFLAGS="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -fsanitize=address ${cxxFlags}" >> ${makeLocalPath}
-        echo LDFLAGS="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
+        echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
+        echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
+        echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -fsanitize=address ${cxxFlags}" >> ${makeLocalPath}
+        echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -ltbb -lgcc ${ldFlags}" >> ${makeLocalPath}
     """
 }
 
