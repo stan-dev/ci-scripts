@@ -310,6 +310,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
+                            args '--pull always'
                         }
                     }
                     steps {
@@ -336,6 +337,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
+                            args '--pull always'
                         }
                     }
                     steps {
@@ -362,6 +364,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
+                            args '--pull always'
                         }
                     }
                     steps {
