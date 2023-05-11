@@ -26,7 +26,7 @@ def setupMakeLocal(String o = "", String cc = "" , String cxx = "" , String cFla
         echo CXX="clang++ ${cxx}" >> ${makeLocalPath}
         echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
         echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
-        echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 -fsanitize=address ${cxxFlags}" >> ${makeLocalPath}
+        echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 ${cxxFlags}" >> ${makeLocalPath}
         echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
     """
 }
@@ -59,7 +59,7 @@ def runPerformanceTests(String testsPath, String stancFlags = ""){
         cd performance-tests-cmdstan/cmdstan
         echo 'O=0' >> make/local
         make -j${env.PARALLEL} build; cd ..
-        python3 runPerformanceTests.py -j${env.PARALLEL} --runs=0 ${testsPath}
+        python3 runPerformanceTests.py -j${env.PARALLEL} --runs=2 ${testsPath}
     """
 }
 
