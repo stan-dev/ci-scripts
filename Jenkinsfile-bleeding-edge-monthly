@@ -397,7 +397,7 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    pip3 install -U Pillow
+                                    pip3 install -U Pillow --break-system-packages
                                     python3 runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
                                 """
                             }
