@@ -6,8 +6,12 @@ USER root
 ARG PUID
 ARG PGID
 
+ENV TZ="America/New_York"
+
 # Install OS depdencies
-RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake ninja-build sudo dos2unix python3-pip -y
+RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake make ninja-build sudo dos2unix python3-pip \
+    libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget  \
+    libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
 
 # Install latest gcc, g++ from ubuntu toolchain ppa
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
@@ -19,6 +23,9 @@ RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq 
     # Set gcc and g++ to latest version
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"${major}" "${major}" && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"${major}" "${major}"
+
+# Install pyenv
+RUN curl https://pyenv.run | bash
 
 # Add Jenkins user and group
 RUN addgroup -gid ${PGID} jenkins
