@@ -24,9 +24,6 @@ RUN LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq 
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-"${major}" "${major}" && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-"${major}" "${major}"
 
-# Install pyenv
-RUN curl https://pyenv.run | bash
-
 # Add Jenkins user and group
 RUN addgroup -gid ${PGID} jenkins
 RUN adduser --disabled-password --gecos '' --ingroup jenkins --uid ${PUID} jenkins
@@ -62,3 +59,10 @@ RUN git clone https://github.com/llvm/llvm-project.git && \
 
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"
+
+# Install pyenv
+RUN curl https://pyenv.run | bash
+
+# Add pyenv to PATH
+ENV PATH="$HOME/.pyenv/bin:$PATH"
+RUN eval "$(pyenv init --path)" && eval "$(pyenv virtualenv-init -)"
