@@ -372,7 +372,6 @@ pipeline {
                             script {
                                 unstash "Stanc3Setup"
                                 unstash 'ubuntu-exe'
-                                sh "ls -lhart"
                                 sh """
                                     git clone --recursive --depth 50 https://github.com/stan-dev/performance-tests-cmdstan
                                 """
@@ -397,9 +396,7 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    pyenv install 3.8.10
-                                    pyenv global 3.8.10
-                                    python3 runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
+                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
                                 """
                             }
 
@@ -427,7 +424,7 @@ pipeline {
                     steps {
                         unstash "PerfSetup"
                         setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
-                        sh "python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests"
+                        sh "./runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests"
                         junit '*.xml'
                         archiveArtifacts '*.xml'
                 }
@@ -443,7 +440,7 @@ pipeline {
                 steps {
                     unstash "PerfSetup"
                     setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
-                    sh "python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests "
+                    sh "./runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests "
                 }
             }
             }
