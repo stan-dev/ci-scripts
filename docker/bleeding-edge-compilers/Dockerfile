@@ -62,3 +62,14 @@ RUN git clone https://github.com/llvm/llvm-project.git && \
 
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"
+
+# Install pyenv
+RUN curl https://pyenv.run | bash
+
+RUN echo "export PYENV_ROOT=\"/home/jenkins/.pyenv\"" > ~/.bash_profile
+RUN echo "command -v pyenv >/dev/null || export PATH=\"/home/jenkins/.pyenv/bin:$PATH\"" >> ~/.bash_profile
+RUN echo "eval \"$(pyenv init --path)\"" >> ~/.bash_profile
+
+RUN PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.10
+RUN pyenv global 3.8.10
+ENV PYTHONHOME="/home/jenkins/.pyenv/versions/3.8.10"
