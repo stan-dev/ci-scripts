@@ -66,6 +66,8 @@ ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"
 # Install pyenv
 RUN curl https://pyenv.run | bash
 
+ENV PATH="/home/jenkins/.pyenv/bin:$PATH"
+
 RUN echo "export PYENV_ROOT=\"/home/jenkins/.pyenv\"" > ~/.bash_profile
 RUN echo "command -v pyenv >/dev/null || export PATH=\"/home/jenkins/.pyenv/bin:$PATH\"" >> ~/.bash_profile
 RUN echo "eval \"$(pyenv init --path)\"" >> ~/.bash_profile
