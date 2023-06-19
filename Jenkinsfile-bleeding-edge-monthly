@@ -396,7 +396,7 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=10
+                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=20
                                 """
                             }
 

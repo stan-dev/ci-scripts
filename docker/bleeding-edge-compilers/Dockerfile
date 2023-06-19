@@ -63,15 +63,23 @@ RUN git clone https://github.com/llvm/llvm-project.git && \
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"
 
-# Install pyenv
-RUN curl https://pyenv.run | bash
+# # Install pyenv
+# RUN curl https://pyenv.run | bash
 
-ENV PATH="/home/jenkins/.pyenv/bin:$PATH"
+# ENV PATH="/home/jenkins/.pyenv/bin:$PATH"
 
-RUN echo "export PYENV_ROOT=\"/home/jenkins/.pyenv\"" > ~/.bash_profile
-RUN echo "command -v pyenv >/dev/null || export PATH=\"/home/jenkins/.pyenv/bin:$PATH\"" >> ~/.bash_profile
-RUN echo "eval \"$(pyenv init --path)\"" >> ~/.bash_profile
+# RUN echo "export PYENV_ROOT=\"/home/jenkins/.pyenv\"" > ~/.bash_profile
+# RUN echo "command -v pyenv >/dev/null || export PATH=\"/home/jenkins/.pyenv/bin:$PATH\"" >> ~/.bash_profile
+# RUN echo "eval \"$(pyenv init --path)\"" >> ~/.bash_profile
 
-RUN PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.10
-RUN pyenv global 3.8.10
-ENV PYTHONHOME="/home/jenkins/.pyenv/versions/3.8.10"
+# RUN PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.8.10
+# RUN pyenv global 3.8.10
+# ENV PYTHONHOME="/home/jenkins/.pyenv/versions/3.8.10:/home/jenkins/.pyenv/versions/3.8.10"
+# ENV PYTHONPATH="/home/jenkins/.pyenv/versions/3.8.10"
+
+#   sys.path = [
+#     '/home/jenkins/.pyenv/versions/3.8.10',
+#     '/home/jenkins/.pyenv/versions/3.8.10/lib/python311.zip',
+#     '/home/jenkins/.pyenv/versions/3.8.10/lib/python3.11',
+#     '/home/jenkins/.pyenv/versions/3.8.10/lib/python3.11/lib-dynload',
+#   ]
