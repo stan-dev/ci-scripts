@@ -37,20 +37,23 @@ RUN chown -f -R jenkins:jenkins /etc || true
 USER jenkins
 WORKDIR /home/jenkins
 
+ENV clangbuild=/home/jenkins/llvm-project/build
+ENV PATH=$clangbuild/bin:$PATH
+ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
+
 # Download the source code, build & install libcxx
 RUN git clone --depth=1 https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
     mkdir build && cd build && \
     cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm && \
-    make clang && \
+    make clang -j8 && \
     clang --help && \
-    cd .. && rm -rf build && mkdir build && cd build && \
     cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;third-party;test-suite" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
     ninja -C build cxx cxxabi unwind && \
     ninja -C build check-cxx check-cxxabi check-unwind && \
     ninja -C build install-cxx install-cxxabi install-unwind && \
     ldconfig /usr/local/lib && \
-    cd ../../ && rm -rf llvm-project
+    cd ../../
 
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"
