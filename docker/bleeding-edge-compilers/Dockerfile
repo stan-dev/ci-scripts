@@ -43,7 +43,6 @@ RUN git clone --depth=1 https://github.com/llvm/llvm-project.git && \
     mkdir build && cd build && \
     cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm && \
     make clang && \
-    make check-clang && \
     clang --help && \
     cd .. && rm -rf build && mkdir build && cd build && \
     cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;third-party;test-suite" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang && \
