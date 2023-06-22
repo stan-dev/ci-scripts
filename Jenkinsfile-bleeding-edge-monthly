@@ -122,32 +122,32 @@ pipeline {
             }
         }
 
-        stage('Prepare math') {
-            agent {
-                docker {
-                    image 'alpine/git'
-                    label 'linux'
-                    args "--entrypoint=\'\'"
-                }
-            }
-            steps {
-                script {
-                    sh """
-                        rm -rf math
-                        git clone https://github.com/stan-dev/math.git
-                        cd math
-                        git checkout ${params.math_pr}
-                        git clean -xffd
-                    """
-                    stash 'MathSetup'
-                }
-            }
-            post {
-                always {
-                    deleteDir()
-                }
-            }
-        }
+        // stage('Prepare math') {
+        //     agent {
+        //         docker {
+        //             image 'alpine/git'
+        //             label 'linux'
+        //             args "--entrypoint=\'\'"
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             sh """
+        //                 rm -rf math
+        //                 git clone https://github.com/stan-dev/math.git
+        //                 cd math
+        //                 git checkout ${params.math_pr}
+        //                 git clean -xffd
+        //             """
+        //             stash 'MathSetup'
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             deleteDir()
+        //         }
+        //     }
+        // }
 
         stage('Prepare Performance-Tests-Cmdstan') {
             agent {
@@ -182,56 +182,56 @@ pipeline {
             }
         }
 
-        stage('Prepare stanc3') {
-            agent {
-                docker {
-                    image 'alpine/git'
-                    label 'linux'
-                    args "--entrypoint=\'\'"
-                }
-            }
-            steps {
-                script {
-                    sh """
-                        rm -rf stanc3
-                        git clone https://github.com/stan-dev/stanc3.git
-                        cd stanc3
-                        git submodule update --init --recursive
-                        git checkout ${params.stanc3_pr}
-                        git clean -xffd
-                    """
+        // stage('Prepare stanc3') {
+        //     agent {
+        //         docker {
+        //             image 'alpine/git'
+        //             label 'linux'
+        //             args "--entrypoint=\'\'"
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             sh """
+        //                 rm -rf stanc3
+        //                 git clone https://github.com/stan-dev/stanc3.git
+        //                 cd stanc3
+        //                 git submodule update --init --recursive
+        //                 git checkout ${params.stanc3_pr}
+        //                 git clean -xffd
+        //             """
 
-                    stash 'Stanc3Setup'
-                }
-            }
-            post {
-                always {
-                    deleteDir()
-                }
-            }
-        }
+        //             stash 'Stanc3Setup'
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             deleteDir()
+        //         }
+        //     }
+        // }
     
-        stage("Build Stanc3") {
-            agent {
-                docker {
-                    image 'stanorg/stanc3:debianfi'
-                    //Forces image to ignore entrypoint
-                    args "--entrypoint=\'\'"
-                    label 'linux'
-                }
-            }
-            steps {
-                unstash "Stanc3Setup"
-                sh"""
-                    eval \$(opam env)
-                    dune build @install
-                """
+        // stage("Build Stanc3") {
+        //     agent {
+        //         docker {
+        //             image 'stanorg/stanc3:debianfi'
+        //             //Forces image to ignore entrypoint
+        //             args "--entrypoint=\'\'"
+        //             label 'linux'
+        //         }
+        //     }
+        //     steps {
+        //         unstash "Stanc3Setup"
+        //         sh"""
+        //             eval \$(opam env)
+        //             dune build @install
+        //         """
 
-                sh "mkdir -p bin && mv _build/default/stanc3/src/stanc/stanc.exe bin/stanc"
-                stash name:'ubuntu-exe', includes:'bin/stanc, notes/working-models.txt'
-            }
-            post { always { sh "rm -rf ./*" }}
-        }
+        //         sh "mkdir -p bin && mv _build/default/stanc3/src/stanc/stanc.exe bin/stanc"
+        //         stash name:'ubuntu-exe', includes:'bin/stanc, notes/working-models.txt'
+        //     }
+        //     post { always { sh "rm -rf ./*" }}
+        // }
 
         // stage('Full Unit Tests') {
         //     failFast true
