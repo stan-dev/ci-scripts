@@ -9,7 +9,7 @@ ARG PGID
 ENV TZ="America/New_York"
 
 # Install OS depdencies
-RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake make ninja-build sudo dos2unix python3 python3-pip \
+RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential libmpc-dev jq gcc-multilib software-properties-common cmake make ninja-build sudo dos2unix python3 python3-pip python3-venv \
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget  \
     libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
 

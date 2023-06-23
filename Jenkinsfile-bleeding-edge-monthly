@@ -425,7 +425,9 @@ pipeline {
                         unstash "PerfSetup"
                         setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                         sh """
-                            pip3 install statistics --break-system-packages
+                            python3 -m venv .venv
+                            source .venv/bin/activate
+                            python3 -m pip install statistics
                             ./runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
                         """
                         junit '*.xml'
@@ -444,7 +446,9 @@ pipeline {
                     unstash "PerfSetup"
                     setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                     sh """
-                        pip3 install statistics --break-system-packages
+                        python3 -m venv .venv
+                        source .venv/bin/activate
+                        python3 -m pip install statistics
                         ./runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
                     """
                 }
