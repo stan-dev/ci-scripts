@@ -428,7 +428,7 @@ pipeline {
                             python3 -m venv .venv
                             source .venv/bin/activate
                             python3 -m pip install statistics
-                            ./runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
+                            python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
                         """
                         junit '*.xml'
                         archiveArtifacts '*.xml'
@@ -449,7 +449,7 @@ pipeline {
                         python3 -m venv .venv
                         source .venv/bin/activate
                         python3 -m pip install statistics
-                        ./runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
+                        python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
                     """
                 }
             }
