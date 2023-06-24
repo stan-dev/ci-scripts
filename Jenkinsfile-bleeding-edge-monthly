@@ -20,8 +20,8 @@ def runTests(String testPath, boolean jumbo = false) {
 
 def setupMakeLocal(String o = "", String cc = "" , String cxx = "" , String cFlags = "", String cppFlags = "", String cxxFlags = "", String ldFlags = "", String makeLocalPath = "make/local") {
     // When ready, change O=3
+    //         echo O="${o}" >> ${makeLocalPath}
     sh """
-        echo O="0 ${o}" >> ${makeLocalPath}
         echo CC="clang ${cc}" >> ${makeLocalPath}
         echo CXX="clang++ ${cxx}" >> ${makeLocalPath}
         echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
@@ -42,7 +42,7 @@ def runPerformanceTests(String testsPath, String stancFlags = ""){
     utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
     utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
 
-    setupMakeLocal("","","","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    setupMakeLocal("0","","","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
 
     sh """
         cd performance-tests-cmdstan
@@ -378,7 +378,7 @@ pipeline {
         //                         utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
         //                         utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
         //                         utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
-        //                         setupMakeLocal("","","","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
+        //                         setupMakeLocal("0","","","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
         //                         sh """
         //                             cd performance-tests-cmdstan
         //                             git show HEAD --stat
@@ -423,7 +423,7 @@ pipeline {
                     agent { label 'osx && intel' }
                     steps {
                         unstash "PerfSetup"
-                        setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                        setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                         sh """
                             python3 -m venv .venv
                             source .venv/bin/activate
@@ -444,7 +444,7 @@ pipeline {
                 }
                 steps {
                     unstash "PerfSetup"
-                    setupMakeLocal("","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                    setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                     sh """
                         python3 -m venv .venv
                         source .venv/bin/activate
