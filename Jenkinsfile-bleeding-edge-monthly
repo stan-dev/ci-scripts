@@ -123,13 +123,13 @@ pipeline {
 
         stage('Pull latest docker image') {
             parallel {
-                stage('Rev/Fwd Unit Tests') {
+                stage('Pull on v100') {
                     agent { label 'linux && v100' }
                     steps {
                         sh "docker pull stanorg/ci:bleeding-edge-compilers"
                     }
                 }
-                stage('Mix Unit Tests') {
+                stage('Pull on k40') {
                     agent { label 'linux && k40' }
                     steps {
                         sh "docker pull stanorg/ci:bleeding-edge-compilers"
