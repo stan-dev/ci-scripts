@@ -84,7 +84,7 @@ pipeline {
     environment {
         STAN_NUM_THREADS = 4
         N_TESTS = 100
-        PARALLEL = 1 // Change to 4 when ready
+        PARALLEL = 4
         GCC = 'g++'
     }
     stages {
@@ -117,6 +117,23 @@ pipeline {
             post {
                 always {
                     deleteDir()
+                }
+            }
+        }
+
+        stage('Pull latest docker image') {
+            parallel {
+                stage('Rev/Fwd Unit Tests') {
+                    agent { label 'linux && v100' }
+                    steps {
+                        sh "docker pull stanorg/ci:bleeding-edge-compilers"
+                    }
+                }
+                stage('Mix Unit Tests') {
+                    agent { label 'linux && k40' }
+                    steps {
+                        sh "docker pull stanorg/ci:bleeding-edge-compilers"
+                    }
                 }
             }
         }
