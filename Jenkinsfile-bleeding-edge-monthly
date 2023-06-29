@@ -18,19 +18,23 @@ def runTests(String testPath, boolean jumbo = false) {
     finally { junit 'test/**/*.xml' }
 }
 
-def setupMakeLocal(String o = "3", String cc = "" , String cxx = "" , String cFlags = "", String cppFlags = "", String cxxFlags = "", String ldFlags = "", String makeLocalPath = "make/local") {
+def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" , String cFlags = "", String cppFlags = "", String cxxFlags = "", String ldFlags = "", String makeLocalPath = "make/local") {
     sh """
         echo O="${o}" >> ${makeLocalPath}
-        echo CC="clang ${cc}" >> ${makeLocalPath}
-        echo CXX="clang++ ${cxx}" >> ${makeLocalPath}
-        echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
-        echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
-        echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 ${cxxFlags}" >> ${makeLocalPath}
-        echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
+        echo CC="${cc}" >> ${makeLocalPath}
+        echo CXX="${cxx}" >> ${makeLocalPath}
     """
+    if (cc = "clang") {
+        sh """
+            echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
+            echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
+            echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 ${cxxFlags}" >> ${makeLocalPath}
+            echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
+        """
+    }
 }
 
-def runPerformanceTests(String testsPath, String stancFlags = ""){
+def runPerformanceTests(String testsPath, String stancFlags = "", String compiler = "clang"){
     unstash 'ubuntu-exe'
 
     sh """
@@ -41,7 +45,12 @@ def runPerformanceTests(String testsPath, String stancFlags = ""){
     utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
     utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
 
-    setupMakeLocal("0","","","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    if (compiler == "gcc"){
+        setupMakeLocal("0","gcc","gcc++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    }
+    else if (compiler == "clang"){
+        setupMakeLocal("0","clang","clang++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    }
 
     sh """
         cd performance-tests-cmdstan
@@ -250,9 +259,8 @@ pipeline {
         }
 
         stage('Full Unit Tests') {
-            failFast true
             parallel {
-                stage('Rev/Fwd Unit Tests') {
+                stage('Rev/Fwd Unit Tests - CLANG') {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -264,7 +272,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             script {
-                                setupMakeLocal()
+                                setupMakeLocal("3", "clang", "clang++")
                                 runTests("test/unit/math/rev")
                                 runTests("test/unit/math/fwd")
                             }
@@ -273,7 +281,7 @@ pipeline {
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
-                stage('Mix Unit Tests') {
+                stage('Mix Unit Tests - CLANG') {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -285,7 +293,7 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             script {
-                                setupMakeLocal()
+                                setupMakeLocal("3", "clang", "clang++")
                                 runTests("test/unit/math/mix", true)
                             }
                         }
@@ -293,7 +301,7 @@ pipeline {
                     }
                     post { always { retry(3) { deleteDir() } } }
                 }
-                stage('Prim Unit Tests') {
+                stage('Prim Unit Tests - CLANG') {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -305,7 +313,71 @@ pipeline {
                         unstash 'MathSetup'
                         dir('math') {
                             script {
-                                setupMakeLocal()
+                                setupMakeLocal("3", "clang", "clang++")
+                                runTests("test/unit/*_test.cpp", false)
+                                runTests("test/unit/math/*_test.cpp", false)
+                                runTests("test/unit/math/prim", true)
+                                runTests("test/unit/math/memory", false)
+                            }
+                        }
+
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Rev/Fwd Unit Tests - GCC') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always --cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        dir('math') {
+                            script {
+                                setupMakeLocal("3", "gcc", "gcc++")
+                                runTests("test/unit/math/rev")
+                                runTests("test/unit/math/fwd")
+                            }
+                        }
+
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Mix Unit Tests - GCC') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always --cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        dir('math') {
+                            script {
+                                setupMakeLocal("3", "gcc", "gcc++")
+                                runTests("test/unit/math/mix", true)
+                            }
+                        }
+
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Prim Unit Tests - GCC') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always --cap-add SYS_PTRACE'
+                        }
+                    }
+                    steps {
+                        unstash 'MathSetup'
+                        dir('math') {
+                            script {
+                                setupMakeLocal("3", "gcc", "gcc++")
                                 runTests("test/unit/*_test.cpp", false)
                                 runTests("test/unit/math/*_test.cpp", false)
                                 runTests("test/unit/math/prim", true)
@@ -429,14 +501,143 @@ pipeline {
                     }
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
                 }
+                stage("Compile tests - good at O=1 - GCC") {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
+                    steps {
+                        dir("${env.WORKSPACE}/compile-good-O1"){
+                            unstash "Stanc3Setup"
+                            script {
+                                runPerformanceTests("../test/integration/good", "--O1", "gcc")
+                            }
+
+                            xunit([GoogleTest(
+                                deleteOutputFiles: false,
+                                failIfNotNew: true,
+                                pattern: 'performance-tests-cmdstan/performance.xml',
+                                skipNoTestFiles: false,
+                                stopProcessingIfError: false)
+                            ])
+                        }
+                    }
+                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-good-O1/*" }}
+                }
+
+                stage("Compile tests - example-models at O=1 - GCC") {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
+                    steps {
+                        dir("${env.WORKSPACE}/compile-example-O1"){
+                            script {
+                                unstash "Stanc3Setup"
+                                runPerformanceTests("example-models", "--O1", "gcc")
+                            }
+
+                            xunit([GoogleTest(
+                                deleteOutputFiles: false,
+                                failIfNotNew: true,
+                                pattern: 'performance-tests-cmdstan/performance.xml',
+                                skipNoTestFiles: false,
+                                stopProcessingIfError: false)
+                            ])
+                        }
+                    }
+                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-example-O1/*" }}
+                }
+
+                stage("Model end-to-end - GCC") {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
+                    steps {
+                        dir("${env.WORKSPACE}/compile-end-to-end-O=1"){
+                            script {
+                                unstash "Stanc3Setup"
+                                unstash 'ubuntu-exe'
+                                sh """
+                                    git clone --recursive --depth 50 https://github.com/stan-dev/performance-tests-cmdstan
+                                """
+                                utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
+                                utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
+                                utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
+                                setupMakeLocal("3","gcc","gcc++","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
+                                sh """
+                                    cd performance-tests-cmdstan
+                                    git show HEAD --stat
+                                    echo "example-models/regression_tests/mother.stan" > all.tests
+                                    cat known_good_perf_all.tests >> all.tests
+                                    echo "" >> all.tests
+                                    cat shotgun_perf_all.tests >> all.tests
+                                    cat all.tests
+                                    echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
+                                    pwd
+                                    cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
+                                    pwd
+                                    rm bin/stanc
+                                    cp ../../bin/stanc bin/stanc
+                                    make print-compiler-flags
+                                    make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
+                                    echo "STANCFLAGS += --O1" >> cmdstan/make/local
+                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=20
+                                """
+                            }
+
+                            xunit([GoogleTest(
+                                deleteOutputFiles: false,
+                                failIfNotNew: true,
+                                pattern: 'performance-tests-cmdstan/performance.xml',
+                                skipNoTestFiles: false,
+                                stopProcessingIfError: false)
+                            ])
+
+                            archiveArtifacts 'performance-tests-cmdstan/performance.xml'
+                        }
+                    }
+                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
+                }
             }
         }
 
         stage('CmdStan Perf Tests') {
             parallel {
-                stage("Numerical Accuracy and Performance Tests on Known-Good Models") {
-                    // This will error out on MAC M1 architecture
-                    agent { label 'osx && intel' }
+                stage('Numerical Accuracy and Performance Tests on Known-Good Models') {
+                        // This will error out on MAC M1 architecture
+                        agent { label 'osx && intel' }
+                        steps {
+                            unstash "PerfSetup"
+                            setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                            sh """
+                                python3 -m venv .venv
+                                source .venv/bin/activate
+                                python3 -m pip install statistics
+                                python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
+                            """
+                            junit '*.xml'
+                            archiveArtifacts '*.xml'
+                    }
+                }
+                stage('Shotgun Performance Regression Tests') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
                     steps {
                         unstash "PerfSetup"
                         setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
@@ -444,31 +645,45 @@ pipeline {
                             python3 -m venv .venv
                             source .venv/bin/activate
                             python3 -m pip install statistics
-                            python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
+                            python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
                         """
-                        junit '*.xml'
-                        archiveArtifacts '*.xml'
-                }
-            }
-            stage('Shotgun Performance Regression Tests') {
-                agent {
-                    docker {
-                        image 'stanorg/ci:bleeding-edge-compilers'
-                        label 'linux'
-                        args '--pull always'
                     }
                 }
-                steps {
-                    unstash "PerfSetup"
-                    setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
-                    sh """
-                        python3 -m venv .venv
-                        source .venv/bin/activate
-                        python3 -m pip install statistics
-                        python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
-                    """
+                stage('Numerical Accuracy and Performance Tests on Known-Good Models - GCC') {
+                        // This will error out on MAC M1 architecture
+                        agent { label 'osx && intel' }
+                        steps {
+                            unstash "PerfSetup"
+                            setupMakeLocal("0","gcc","gcc++","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                            sh """
+                                python3 -m venv .venv
+                                source .venv/bin/activate
+                                python3 -m pip install statistics
+                                python3 runPerformanceTests.py --runs 3 --check-golds --name=known_good_perf --tests-file=known_good_perf_all.tests
+                            """
+                            junit '*.xml'
+                            archiveArtifacts '*.xml'
+                    }
                 }
-            }
+                stage('Shotgun Performance Regression Tests - GCC') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:bleeding-edge-compilers'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
+                    steps {
+                        unstash "PerfSetup"
+                        setupMakeLocal("0","gcc","gcc++","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                        sh """
+                            python3 -m venv .venv
+                            source .venv/bin/activate
+                            python3 -m pip install statistics
+                            python3 runPerformanceTests.py --runs 2 --name=shotgun_perf --tests-file=shotgun_perf_all.tests
+                        """
+                    }
+                }
             }
         }
 
