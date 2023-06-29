@@ -76,7 +76,6 @@ pipeline {
     options {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
-        parallelsAlwaysFailFast()
     }
     parameters {
         booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
