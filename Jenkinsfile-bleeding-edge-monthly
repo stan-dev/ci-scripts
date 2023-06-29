@@ -24,7 +24,7 @@ def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" 
         echo CC="${cc}" >> ${makeLocalPath}
         echo CXX="${cxx}" >> ${makeLocalPath}
     """
-    if (cc = "clang") {
+    if (cc == "clang") {
         sh """
             echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
             echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
