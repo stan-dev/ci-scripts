@@ -42,7 +42,8 @@ ENV PATH=$clangbuild/bin:$PATH
 ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
 
 # Download the source code, build & install libcxx
-RUN git clone --depth=1 https://github.com/llvm/llvm-project.git && \
+RUN LATEST_RELEASE_VERSION=$(curl https://api.github.com/repos/llvm/llvm-project/tags | jq '.[]|select(.name | startswith("llvmorg-"))' | jq '.name' | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1 ) && \
+    git clone -b "llvmorg-${LATEST_RELEASE_VERSION}" --depth=1 https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
     mkdir build && cd build && \
     cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm && \
