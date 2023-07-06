@@ -404,7 +404,7 @@ pipeline {
                 expression { params.run_cmdstan_math_tests }
             }
             parallel {
-                stage("Compile tests - good at O=1") {
+                stage("Compile tests - good at O=1 - CLANG") {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -416,7 +416,7 @@ pipeline {
                         dir("${env.WORKSPACE}/compile-good-O1"){
                             unstash "Stanc3Setup"
                             script {
-                                runPerformanceTests("../test/integration/good", "--O1")
+                                runPerformanceTests("../test/integration/good", "--O1", "clang")
                             }
 
                             xunit([GoogleTest(
@@ -431,7 +431,7 @@ pipeline {
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-good-O1/*" }}
                 }
 
-                stage("Compile tests - example-models at O=1") {
+                stage("Compile tests - example-models at O=1 - CLANG") {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -443,7 +443,7 @@ pipeline {
                         dir("${env.WORKSPACE}/compile-example-O1"){
                             script {
                                 unstash "Stanc3Setup"
-                                runPerformanceTests("example-models", "--O1")
+                                runPerformanceTests("example-models", "--O1", "clang")
                             }
 
                             xunit([GoogleTest(
@@ -458,7 +458,7 @@ pipeline {
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-example-O1/*" }}
                 }
 
-                stage("Model end-to-end") {
+                stage("Model end-to-end - CLANG") {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -477,7 +477,7 @@ pipeline {
                                 utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
                                 utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
                                 utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
-                                setupMakeLocal("3","","","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
+                                setupMakeLocal("3","clang", "clang++","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
                                 sh """
                                     cd performance-tests-cmdstan
                                     git show HEAD --stat
@@ -629,12 +629,12 @@ pipeline {
                 expression { params.run_cmdstan_perf_tests }
             }
             parallel {
-                stage('Numerical Accuracy and Performance Tests on Known-Good Models') {
+                stage('Numerical Accuracy and Performance Tests on Known-Good Models - CLANG') {
                         // This will error out on MAC M1 architecture
                         agent { label 'osx && intel' }
                         steps {
                             unstash "PerfSetup"
-                            setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                            setupMakeLocal("0","clang","clang++","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                             sh """
                                 python3 -m venv .venv
                                 source .venv/bin/activate
@@ -645,7 +645,7 @@ pipeline {
                             archiveArtifacts '*.xml'
                     }
                 }
-                stage('Shotgun Performance Regression Tests') {
+                stage('Shotgun Performance Regression Tests - CLANG') {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -655,7 +655,7 @@ pipeline {
                     }
                     steps {
                         unstash "PerfSetup"
-                        setupMakeLocal("0","","","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
+                        setupMakeLocal("0","clang","clang++","","","-march=core2 \n${stanc3_bin_url()}", "", "cmdstan/make/local")
                         sh """
                             python3 -m venv .venv
                             source .venv/bin/activate
