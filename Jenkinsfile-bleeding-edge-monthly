@@ -89,6 +89,9 @@ pipeline {
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
         string(defaultValue: 'master', name: 'stanc3_pr',
                description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo.")
+        booleanParam(defaultValue: true, description: 'Run Full Unit Tests', name: 'run_full_unit_tests')
+        booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
+        booleanParam(defaultValue: true, description: 'Run CmdStan Perf Tests', name: 'run_cmdstan_perf_tests')
     }
     environment {
         STAN_NUM_THREADS = 4
@@ -259,6 +262,10 @@ pipeline {
         }
 
         stage('Full Unit Tests') {
+            when {
+                beforeAgent true
+                expression { params.run_full_unit_tests }
+            }
             parallel {
                 stage('Rev/Fwd Unit Tests - CLANG') {
                     agent {
@@ -392,6 +399,10 @@ pipeline {
         }
 
         stage("CmdStan & Math tests") {
+            when {
+                beforeAgent true
+                expression { params.run_cmdstan_math_tests }
+            }
             parallel {
                 stage("Compile tests - good at O=1") {
                     agent {
@@ -613,6 +624,10 @@ pipeline {
         }
 
         stage('CmdStan Perf Tests') {
+            when {
+                beforeAgent true
+                expression { params.run_cmdstan_perf_tests }
+            }
             parallel {
                 stage('Numerical Accuracy and Performance Tests on Known-Good Models') {
                         // This will error out on MAC M1 architecture
