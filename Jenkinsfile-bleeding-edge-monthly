@@ -32,11 +32,6 @@ def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" 
             echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
         """
     }
-    else {
-        sh """
-            echo CFLAGS+="-stdlib=libstdc++" >> ${makeLocalPath}
-        """
-    }
     sh "${cxx} --version"
 }
 
@@ -409,60 +404,6 @@ pipeline {
                 expression { params.run_cmdstan_math_tests }
             }
             parallel {
-                stage("Compile tests - good at O=1 - CLANG") {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always'
-                        }
-                    }
-                    steps {
-                        dir("${env.WORKSPACE}/compile-good-O1"){
-                            unstash "Stanc3Setup"
-                            script {
-                                runPerformanceTests("../test/integration/good", "--O1", "clang")
-                            }
-
-                            xunit([GoogleTest(
-                                deleteOutputFiles: false,
-                                failIfNotNew: true,
-                                pattern: 'performance-tests-cmdstan/performance.xml',
-                                skipNoTestFiles: false,
-                                stopProcessingIfError: false)
-                            ])
-                        }
-                    }
-                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-good-O1/*" }}
-                }
-
-                stage("Compile tests - example-models at O=1 - CLANG") {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always'
-                        }
-                    }
-                    steps {
-                        dir("${env.WORKSPACE}/compile-example-O1"){
-                            script {
-                                unstash "Stanc3Setup"
-                                runPerformanceTests("example-models", "--O1", "clang")
-                            }
-
-                            xunit([GoogleTest(
-                                deleteOutputFiles: false,
-                                failIfNotNew: true,
-                                pattern: 'performance-tests-cmdstan/performance.xml',
-                                skipNoTestFiles: false,
-                                stopProcessingIfError: false)
-                            ])
-                        }
-                    }
-                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-example-O1/*" }}
-                }
-
                 stage("Model end-to-end - CLANG") {
                     agent {
                         docker {
@@ -482,7 +423,7 @@ pipeline {
                                 utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
                                 utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
                                 utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
-                                setupMakeLocal("3","clang", "clang++ -ltbb","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
+                                setupMakeLocal("3","clang", "clang++","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
                                 sh """
                                     cd performance-tests-cmdstan
                                     git show HEAD --stat
@@ -517,60 +458,6 @@ pipeline {
                     }
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
                 }
-                stage("Compile tests - good at O=1 - GCC") {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always'
-                        }
-                    }
-                    steps {
-                        dir("${env.WORKSPACE}/compile-good-O1"){
-                            unstash "Stanc3Setup"
-                            script {
-                                runPerformanceTests("../test/integration/good", "--O1", "gcc")
-                            }
-
-                            xunit([GoogleTest(
-                                deleteOutputFiles: false,
-                                failIfNotNew: true,
-                                pattern: 'performance-tests-cmdstan/performance.xml',
-                                skipNoTestFiles: false,
-                                stopProcessingIfError: false)
-                            ])
-                        }
-                    }
-                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-good-O1/*" }}
-                }
-
-                stage("Compile tests - example-models at O=1 - GCC") {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always'
-                        }
-                    }
-                    steps {
-                        dir("${env.WORKSPACE}/compile-example-O1"){
-                            script {
-                                unstash "Stanc3Setup"
-                                runPerformanceTests("example-models", "--O1", "gcc")
-                            }
-
-                            xunit([GoogleTest(
-                                deleteOutputFiles: false,
-                                failIfNotNew: true,
-                                pattern: 'performance-tests-cmdstan/performance.xml',
-                                skipNoTestFiles: false,
-                                stopProcessingIfError: false)
-                            ])
-                        }
-                    }
-                    post { always { sh "rm -rf ${env.WORKSPACE}/compile-example-O1/*" }}
-                }
-
                 stage("Model end-to-end - GCC") {
                     agent {
                         docker {
@@ -590,7 +477,7 @@ pipeline {
                                 utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
                                 utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
                                 utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
-                                setupMakeLocal("3","gcc","g++ -ltbb","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
+                                setupMakeLocal("3","gcc","g++","","","-march=core2", "", "performance-tests-cmdstan/cmdstan/make/local")
                                 sh """
                                     cd performance-tests-cmdstan
                                     git show HEAD --stat
