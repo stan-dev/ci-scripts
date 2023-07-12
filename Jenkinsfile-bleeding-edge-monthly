@@ -5,8 +5,6 @@ import org.stan.Utils
 
 utils = new org.stan.Utils()
 
-String stanc3_bin_url() { params.stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n" : "" }
-
 def runTests(String testPath, boolean jumbo = false) {
     try {
         if (jumbo && !params.disableJumbo) {
@@ -80,7 +78,6 @@ pipeline {
     }
     parameters {
         booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
-        string(defaultValue: 'nightly', name: 'stanc3_bin_url', description: 'Custom stanc3 binary url')
         string(defaultValue: 'develop', name: 'cmdstan_pr',
                description: "CmdStan PR to test against. Will check out this PR in the downstream Stan repo.")
         string(defaultValue: 'develop', name: 'stan_pr',
