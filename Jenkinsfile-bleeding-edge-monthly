@@ -519,8 +519,8 @@ pipeline {
                 recordIssues enabledForFailure: false, tool: clang()
             }
         }
-        // success { script { utils.mailBuildResults("SUCCESSFUL") } }
-        // unstable { script { utils.mailBuildResults("UNSTABLE") } }
-        // failure { script { utils.mailBuildResults("FAILURE") } }
+        success { script { utils.mailBuildResults("SUCCESSFUL") } }
+        unstable { script { utils.mailBuildResults("UNSTABLE") } }
+        failure { script { utils.mailBuildResults("FAILURE") } }
     }
 }
