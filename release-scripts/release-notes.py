@@ -58,17 +58,27 @@ while prs_on_page > 0:
                 num_of_prs = num_of_prs + 1
                 body = pr["body"]
                 if REPO_PR_FORMAT[repository] in body:
-                    parsing_release_notes = False
+                    parsing_release_notes = 0
                     for line in body.split("\r\n"):
                         if parsing_release_notes:
                             if line.find("##") >= 0:
-                                parsing_release_notes = False
-                        if parsing_release_notes:
+                                if parsing_release_notes == 3:
+                                    print("\n\t(#" + str(pr["number"]) + ")\n")
+                                else:
+                                    print(" (#" + str(pr["number"]) + ")\n")
+                                parsing_release_notes = 0
+                                continue
+
                             line = line.strip()
                             if len(line) > 0:
-                                print(" - " + line + " (#" + str(pr["number"]) + ")")
+                                if parsing_release_notes == 1: # first line
+                                    parsing_release_notes = 2 # next line would be second
+                                    print(" - " + line, end="")
+                                else:
+                                    print("\n\t" + line,end="")
+                                    parsing_release_notes = 3 # we had a second line
                         if line.find(REPO_PR_FORMAT[repository]) >= 0:
-                            parsing_release_notes = True
+                            parsing_release_notes = 1
                 else:
                     print(" - " + pr['title'] + " (#" + str(pr['number']) +")")
 
