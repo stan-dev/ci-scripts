@@ -1,0 +1,35 @@
+name: Generate Release Notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      last-date:
+        description: 'Last release date'
+        required: true
+        default: '2021-01-01'
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  get-notes:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create Stanc3 notes
+      run: python release-scripts/release-notes.py stanc3 --time ${{ inputs.last-date }} > stanc3.txt
+    - name: Create CmdStan notes
+      run: python release-scripts/release-notes.py cmdstan > cmdstan.txt
+    - name: Create Math notes
+      run: python release-scripts/release-notes.py math > math.txt
+    - name: Create Stan notes
+      run: python release-scripts/release-notes.py stan > stan.txt
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-notes
+        path: |
+          stanc3.txt
+          cmdstan.txt
+          math.txt
+          stan.txt
