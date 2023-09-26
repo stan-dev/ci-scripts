@@ -20,9 +20,16 @@ RUN chown -R jenkins:sudo /usr/local
 USER jenkins
 WORKDIR /home/jenkins
 
+ENV DEBIAN_FRONTEND noninteractive
+ENV OPAMROOT /usr/local/opam
+
 #Copy our script and install ocaml + init
-COPY ./scripts/install_ocaml_windows.sh ./
-RUN printf "\n" | bash -x install_ocaml_windows.sh "--root=/usr/local/opam --disable-sandboxing -y"
+COPY ./scripts/install_opam.sh ./
+RUN printf "\n" | bash -x install_opam.sh
+
+#Copy our script and install ocaml + init
+COPY ./scripts/install_ocaml.sh ./
+RUN printf "\n" | bash -x install_ocaml.sh "--root=/usr/local/opam --disable-sandboxing -y"
 
 #Copy our script and install build dependencies
 COPY ./scripts/install_build_deps_windows.sh ./
