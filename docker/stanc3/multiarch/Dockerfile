@@ -1,7 +1,7 @@
 # Base image
-FROM debian:buster-slim
+FROM debian:buster-20220622-slim
 
-ARG STANC3_BRANCH=master
+ARG STANC3_BRANCH=update/4.14
 ENV STANC3_BRANCH_ENV=${STANC3_BRANCH}
 
 ARG STANC3_ORG=stan-dev
@@ -34,13 +34,13 @@ RUN if [ $(cat ./arch) = "arm64" ]; then \
 RUN curl -L https://github.com/multiarch/qemu-user-static/releases/download/v6.0.0-2/x86_64_qemu-$(cat ./qarch)-static.tar.gz | tar -xzf - -C /usr/bin
 
 RUN opam init --disable-sandboxing -y
-RUN eval $(opam env)
+RUN eval $(opam env) && opam update
 
 # Native-code compilation not available on MIPS, fall back to bytecode
 RUN if [ $(cat ./arch) = "mips64el" ]; then \
-    opam switch create 4.12.0 --packages=ocaml-variants.4.12.0+options,ocaml-option-bytecode-only && opam switch 4.12.0; \
+    opam switch create 4.14.0 --packages=ocaml-variants.4.14.0+options,ocaml-option-bytecode-only && opam switch 4.14.0; \
   else \
-    opam switch create 4.12.0 && opam switch 4.12.0; \
+    opam switch create 4.14.0 && opam switch 4.14.0; \
   fi
 
 RUN eval $(opam env) && opam repo add internet https://opam.ocaml.org

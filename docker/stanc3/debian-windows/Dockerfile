@@ -29,7 +29,7 @@ RUN printf "\n" | bash -x install_opam.sh
 
 #Copy our script and install ocaml + init
 COPY ./scripts/install_ocaml.sh ./
-RUN printf "\n" | bash -x install_ocaml.sh "--root=/usr/local/opam --disable-sandboxing -y"
+RUN printf "\n" | bash -x install_ocaml.sh "stanc"
 
 #Copy our script and install build dependencies
 COPY ./scripts/install_build_deps_windows.sh ./
