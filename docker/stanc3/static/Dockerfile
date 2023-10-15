@@ -27,8 +27,8 @@ RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/co
 #Switch back to the normal user
 USER jenkins
 
-#Init opam, create and switch to 4.12.0, update shell environment
-RUN opam init --disable-sandboxing -y
+#Init opam, create and switch to 4.14.0, update shell environment
+RUN opam init --disable-sandboxing --bare -y
 RUN opam switch create 4.14.0
 RUN opam switch 4.14.0
 RUN eval $(opam env)

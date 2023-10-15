@@ -33,7 +33,7 @@ RUN if [ $(cat ./arch) = "arm64" ]; then \
 # Download needed QEMU binary and place in /usr/bin
 RUN curl -L https://github.com/multiarch/qemu-user-static/releases/download/v6.0.0-2/x86_64_qemu-$(cat ./qarch)-static.tar.gz | tar -xzf - -C /usr/bin
 
-RUN opam init --disable-sandboxing -y
+RUN opam init --disable-sandboxing --bare -y
 RUN eval $(opam env) && opam update
 
 # Native-code compilation not available on MIPS, fall back to bytecode
