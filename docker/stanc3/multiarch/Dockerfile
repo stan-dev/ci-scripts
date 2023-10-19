@@ -38,7 +38,7 @@ RUN eval $(opam env) && opam update
 
 # Native-code compilation not available on MIPS, fall back to bytecode
 RUN if [ $(cat ./arch) = "mips64el" ]; then \
-    opam switch create 4.14.1 --packages=ocaml-variants.4.14.1+options,ocaml-option-bytecode-only && opam switch 4.14.1; \
+    opam switch create 4.14.1 --packages=ocaml-variants.4.14.1+options,ocaml-option-bytecode-only && opam switch 4.14.1 && opam pin num https://github.com/ocaml/num.git -y; \
   else \
     opam switch create 4.14.1 && opam switch 4.14.1; \
   fi
