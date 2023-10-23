@@ -30,7 +30,7 @@ RUN printf "\n" | bash -x install_opam.sh
 
 # Install and initialize ocaml
 COPY ./scripts/install_ocaml.sh ./
-RUN printf "\n" | bash -x install_ocaml.sh
+RUN printf "\n" | bash -x install_ocaml.sh "stanc"
 
 # Install build dependencies
 COPY ./scripts/install_build_deps.sh ./
