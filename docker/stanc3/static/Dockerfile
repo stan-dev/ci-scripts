@@ -1,6 +1,6 @@
 #Use Official Docker Images for OCAML/OPAM
 #https://github.com/ocaml/infrastructure/wiki/Containers
-FROM ocaml/opam:alpine-ocaml-4.12
+FROM ocaml/opam:alpine-ocaml-4.14
 
 #Switch to root user so we can install apk packages
 USER root
@@ -19,18 +19,18 @@ RUN apk update && apk --no-cache add build-base bzip2 git tar curl ca-certificat
 
 # Add a recent version of the Skopeo package, which is used for looking up the correct multiarch docker image
 # http://dl-cdn.alpinelinux.org/alpine/v3.14/community/aarch64/containers-common-0.38.11-r0.apk
-RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/containers-common-0.44.3-r0.apk -o cont.apk && \
-    curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/skopeo-1.5.2-r0.apk -o skopeo.apk && \
+RUN curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/containers-common-0.52.0-r0.apk -o cont.apk && \
+    curl https://dl-cdn.alpinelinux.org/alpine/latest-stable/community/x86_64/skopeo-1.12.0-r3.apk -o skopeo.apk && \
     apk add cont.apk && \
     apk add skopeo.apk
 
 #Switch back to the normal user
 USER jenkins
 
-#Init opam, create and switch to 4.12.0, update shell environment
-RUN opam init --disable-sandboxing -y
-RUN opam switch create 4.12.0
-RUN opam switch 4.12.0
+#Init opam, create and switch to 4.14.0, update shell environment
+RUN opam init --disable-sandboxing --bare -y
+RUN opam switch create 4.14.0
+RUN opam switch 4.14.0
 RUN eval $(opam env)
 
 RUN opam repo add internet https://opam.ocaml.org

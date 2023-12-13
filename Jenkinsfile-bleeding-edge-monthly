@@ -1,7 +1,10 @@
 #!/usr/bin/env groovy
 
+
 @Library('StanUtils')
 import org.stan.Utils
+
+utils = new org.stan.Utils()
 
 utils = new org.stan.Utils()
 
@@ -14,8 +17,62 @@ def runTests(String testPath, boolean jumbo = false) {
         }
     }
     finally { junit 'test/**/*.xml' }
+    finally { junit 'test/**/*.xml' }
 }
 
+def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" , String cFlags = "", String cppFlags = "", String cxxFlags = "", String ldFlags = "", String makeLocalPath = "make/local") {
+    sh """
+        echo O="${o}" >> ${makeLocalPath}
+        echo CC="${cc}" >> ${makeLocalPath}
+        echo CXX="${cxx}" >> ${makeLocalPath}
+    """
+    if (cc == "clang") {
+        sh """
+            echo CFLAGS+="-stdlib=libc++ ${cFlags}" >> ${makeLocalPath}
+            echo CPPFLAGS+="-nostdinc++ -nodefaultlibs -I/usr/local/include/c++/v1 ${cppFlags}" >> ${makeLocalPath}
+            echo CXXFLAGS+="-nostdinc++ -nostdlib++ -I/usr/local/include/c++/v1 ${cxxFlags}" >> ${makeLocalPath}
+            echo LDFLAGS+="-L/usr/local/lib -Wl,-R/usr/local/lib -I/usr/local/include/c++/v1  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -lc++ -lc++abi -lm -lc -lgcc_s -lgcc ${ldFlags}" >> ${makeLocalPath}
+        """
+    }
+    sh "${cxx} --version"
+}
+
+def runPerformanceTests(String testsPath, String stancFlags = "", String compiler = "clang"){
+    unstash 'ubuntu-exe'
+
+    sh """
+        git clone --recursive --depth 50 https://github.com/stan-dev/performance-tests-cmdstan
+    """
+
+    utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
+    utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
+    utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
+
+    if (compiler == "gcc"){
+        setupMakeLocal("0","gcc","g++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    }
+    else if (compiler == "clang"){
+        setupMakeLocal("0","clang","clang++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
+    }
+
+    sh """
+        cd performance-tests-cmdstan
+        mkdir cmdstan/bin
+        cp ../bin/stanc cmdstan/bin/linux-stanc
+        cd cmdstan; make clean-all;
+    """
+
+    if (stancFlags?.trim()) {
+        sh "cd performance-tests-cmdstan/cmdstan && echo 'STANCFLAGS= $stancFlags' >> make/local"
+    }
+
+    sh """
+        cd performance-tests-cmdstan/cmdstan
+        echo 'O=0' >> make/local
+        make -j${env.PARALLEL} build; cd ..
+        python3 runPerformanceTests.py -j${env.PARALLEL} --runs=0 ${testsPath}
+    """
+}
 def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" , String cFlags = "", String cppFlags = "", String cxxFlags = "", String ldFlags = "", String makeLocalPath = "make/local") {
     sh """
         echo O="${o}" >> ${makeLocalPath}
@@ -88,11 +145,23 @@ pipeline {
                description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo.")
         booleanParam(defaultValue: true, description: 'Run Full Unit Tests', name: 'run_full_unit_tests')
         booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
+        booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
+        string(defaultValue: 'develop', name: 'cmdstan_pr',
+               description: "CmdStan PR to test against. Will check out this PR in the downstream Stan repo.")
+        string(defaultValue: 'develop', name: 'stan_pr',
+               description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
+        string(defaultValue: 'develop', name: 'math_pr',
+               description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
+        string(defaultValue: 'master', name: 'stanc3_pr',
+               description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo.")
+        booleanParam(defaultValue: true, description: 'Run Full Unit Tests', name: 'run_full_unit_tests')
+        booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
     }
     environment {
         STAN_NUM_THREADS = 4
         N_TESTS = 100
         PARALLEL = 4
+        GCC = 'g++'
         GCC = 'g++'
     }
     stages {
