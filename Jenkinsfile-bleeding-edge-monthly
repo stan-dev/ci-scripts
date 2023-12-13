@@ -238,7 +238,7 @@ pipeline {
         stage("Get nightly Stanc3") {
             agent {
                 docker {
-                    image 'ubuntu:bionic'
+                    image 'osexp2000/ubuntu-with-utils'
                     args "--entrypoint=\'\'"
                     label 'linux'
                 }
