@@ -235,24 +235,19 @@ pipeline {
             }
         }
     
-        stage("Build Stanc3") {
+        stage("Get nightly Stanc3") {
             agent {
                 docker {
-                    image 'stanorg/stanc3:debianfi'
-                    //Forces image to ignore entrypoint
+                    image 'ubuntu:bionic'
                     args "--entrypoint=\'\'"
                     label 'linux'
                 }
             }
             steps {
-                unstash "Stanc3Setup"
                 sh"""
-                    eval \$(opam env)
-                    dune build @install
+                    wget -O stanc https://github.com/stan-dev/stanc3/releases/download/nightly/linux-stanc && mkdir bin && mv stanc bin/
                 """
-
-                sh "mkdir -p bin && mv _build/default/stanc3/src/stanc/stanc.exe bin/stanc"
-                stash name:'ubuntu-exe', includes:'bin/stanc, notes/working-models.txt'
+                stash name:'ubuntu-exe', includes:'bin/stanc'
             }
             post { always { sh "rm -rf ./*" }}
         }
