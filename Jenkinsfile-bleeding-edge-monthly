@@ -105,7 +105,7 @@ pipeline {
             }
             agent {
                 docker {
-                    image 'stanorg/stanc3:staticfi'
+                    image 'docker'
                     label 'linux'
                     args "--pull always --group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
                 }
