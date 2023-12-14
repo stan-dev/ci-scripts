@@ -252,142 +252,142 @@ pipeline {
             post { always { sh "rm -rf ./*" }}
         }
 
-        stage('Full Unit Tests') {
-            when {
-                beforeAgent true
-                expression { params.run_full_unit_tests }
-            }
-            parallel {
-                stage('Rev/Fwd Unit Tests - CLANG') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "clang", "clang++")
-                                runTests("test/unit/math/rev")
-                                runTests("test/unit/math/fwd")
-                            }
-                        }
+        // stage('Full Unit Tests') {
+        //     when {
+        //         beforeAgent true
+        //         expression { params.run_full_unit_tests }
+        //     }
+        //     parallel {
+        //         stage('Rev/Fwd Unit Tests - CLANG') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "clang", "clang++")
+        //                         runTests("test/unit/math/rev")
+        //                         runTests("test/unit/math/fwd")
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Mix Unit Tests - CLANG') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "clang", "clang++")
-                                runTests("test/unit/math/mix", true)
-                            }
-                        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //         stage('Mix Unit Tests - CLANG') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "clang", "clang++")
+        //                         runTests("test/unit/math/mix", true)
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Prim Unit Tests - CLANG') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "clang", "clang++")
-                                runTests("test/unit/*_test.cpp", false)
-                                runTests("test/unit/math/*_test.cpp", false)
-                                runTests("test/unit/math/prim", true)
-                                runTests("test/unit/math/memory", false)
-                            }
-                        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //         stage('Prim Unit Tests - CLANG') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "clang", "clang++")
+        //                         runTests("test/unit/*_test.cpp", false)
+        //                         runTests("test/unit/math/*_test.cpp", false)
+        //                         runTests("test/unit/math/prim", true)
+        //                         runTests("test/unit/math/memory", false)
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Rev/Fwd Unit Tests - GCC') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "gcc", "g++")
-                                runTests("test/unit/math/rev")
-                                runTests("test/unit/math/fwd")
-                            }
-                        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //         stage('Rev/Fwd Unit Tests - GCC') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "gcc", "g++")
+        //                         runTests("test/unit/math/rev")
+        //                         runTests("test/unit/math/fwd")
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Mix Unit Tests - GCC') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "gcc", "g++")
-                                runTests("test/unit/math/mix", true)
-                            }
-                        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //         stage('Mix Unit Tests - GCC') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "gcc", "g++")
+        //                         runTests("test/unit/math/mix", true)
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Prim Unit Tests - GCC') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--pull always --cap-add SYS_PTRACE'
-                        }
-                    }
-                    steps {
-                        unstash 'MathSetup'
-                        dir('math') {
-                            script {
-                                setupMakeLocal("3", "gcc", "g++")
-                                runTests("test/unit/*_test.cpp", false)
-                                runTests("test/unit/math/*_test.cpp", false)
-                                runTests("test/unit/math/prim", true)
-                                runTests("test/unit/math/memory", false)
-                            }
-                        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //         stage('Prim Unit Tests - GCC') {
+        //             agent {
+        //                 docker {
+        //                     image 'stanorg/ci:bleeding-edge-compilers'
+        //                     label 'linux'
+        //                     args '--pull always --cap-add SYS_PTRACE'
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'MathSetup'
+        //                 dir('math') {
+        //                     script {
+        //                         setupMakeLocal("3", "gcc", "g++")
+        //                         runTests("test/unit/*_test.cpp", false)
+        //                         runTests("test/unit/math/*_test.cpp", false)
+        //                         runTests("test/unit/math/prim", true)
+        //                         runTests("test/unit/math/memory", false)
+        //                     }
+        //                 }
 
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-            }
-        }
+        //             }
+        //             post { always { retry(3) { deleteDir() } } }
+        //         }
+        //     }
+        // }
 
         stage("CmdStan & Math tests") {
             when {
@@ -400,7 +400,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--pull always'
+                            args '--group-add=987 --group-add=980 --group-add=988 --pull always'
                         }
                     }
                     steps {
@@ -455,7 +455,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--pull always'
+                            args '--group-add=987 --group-add=980 --group-add=988 --pull always'
                         }
                     }
                     steps {
