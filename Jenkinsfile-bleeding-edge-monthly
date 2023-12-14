@@ -107,7 +107,7 @@ pipeline {
                 docker {
                     image 'docker'
                     label 'linux'
-                    args "--pull always --group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
+                    args "--pull always --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
             environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
