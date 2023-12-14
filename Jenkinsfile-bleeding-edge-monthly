@@ -107,7 +107,7 @@ pipeline {
                 docker {
                     image 'stanorg/stanc3:staticfi'
                     label 'linux'
-                    args "--pull always --group-add=987 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
+                    args "--pull always --group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
                 }
             }
             environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
@@ -116,7 +116,7 @@ pipeline {
                     retry(3) { checkout scm }
                     sh """
                         cd docker/bleeding-edge-compilers
-                        docker build -t stanorg/ci:bleeding-edge-compilers --build-arg PUID=990 --build-arg PGID=986 .
+                        docker build -t stanorg/ci:bleeding-edge-compilers --build-arg PUID=990 --build-arg PGID=987 .
                         docker login --username stanorg --password "${DOCKER_TOKEN}"
                         docker push stanorg/ci:bleeding-edge-compilers
                     """
@@ -521,3 +521,4 @@ pipeline {
     //     failure { script { utils.mailBuildResults("FAILURE") } }
     // }
 }
+
