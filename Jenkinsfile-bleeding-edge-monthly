@@ -73,6 +73,7 @@ def runPerformanceTests(String testsPath, String stancFlags = "", String compile
 pipeline {
     agent none
     options {
+
         preserveStashes(buildCount: 7)
     }
     parameters {
@@ -240,7 +241,7 @@ pipeline {
             agent {
                 docker {
                     image 'osexp2000/ubuntu-with-utils'
-                    args "--entrypoint=\'\'"
+                    args "--group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\'"
                     label 'linux'
                 }
             }
