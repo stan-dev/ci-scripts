@@ -241,13 +241,14 @@ pipeline {
             agent {
                 docker {
                     image 'osexp2000/ubuntu-with-utils'
-                    args "--group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\'"
+                    args "--entrypoint=\'\'"
                     label 'linux'
                 }
             }
             steps {
                 sh"""
                     wget -O stanc https://github.com/stan-dev/stanc3/releases/download/nightly/linux-stanc && mkdir bin && mv stanc bin/
+                    chmod +x bin/stanc
                 """
                 stash name:'ubuntu-exe', includes:'bin/stanc'
             }
