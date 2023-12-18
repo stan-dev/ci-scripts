@@ -422,7 +422,6 @@ pipeline {
                                     cd performance-tests-cmdstan
                                     git show HEAD --stat
                                     echo "example-models/regression_tests/mother.stan" > all.tests
-                                    echo "stanc3/test/integration/good" >> all.tests
                                     cat known_good_perf_all.tests >> all.tests
                                     echo "" >> all.tests
                                     cat shotgun_perf_all.tests >> all.tests
@@ -437,6 +436,7 @@ pipeline {
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --overwrite-golds --num-samples=20 --runs=0 stanc3/test/integration/good
                                 """
                             }
 
@@ -477,7 +477,6 @@ pipeline {
                                     cd performance-tests-cmdstan
                                     git show HEAD --stat
                                     echo "example-models/regression_tests/mother.stan" > all.tests
-                                    echo "stanc3/test/integration/good" >> all.tests
                                     cat known_good_perf_all.tests >> all.tests
                                     echo "" >> all.tests
                                     cat shotgun_perf_all.tests >> all.tests
@@ -492,6 +491,7 @@ pipeline {
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --overwrite-golds --runs=0 --num-samples=20 stanc3/test/integration/good
                                 """
                             }
 
