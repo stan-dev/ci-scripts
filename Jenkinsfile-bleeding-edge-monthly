@@ -73,7 +73,6 @@ def runPerformanceTests(String testsPath, String stancFlags = "", String compile
 pipeline {
     agent none
     options {
-        skipDefaultCheckout()
         preserveStashes(buildCount: 7)
     }
     parameters {
