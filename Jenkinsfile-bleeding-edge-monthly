@@ -437,7 +437,8 @@ pipeline {
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
                                     pwd
-                                    ls -lhart stanc3/test/integration/good
+                                    ls -lhart .
+                                    tree .
                                     ./runPerformanceTests.py --runs=0 stanc3/test/integration/good
                                 """
                             }
@@ -494,7 +495,8 @@ pipeline {
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
                                     ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
                                     pwd
-                                    ls -lhart stanc3/test/integration/good
+                                    ls -lhart .
+                                    tree .
                                     ./runPerformanceTests.py --runs=0 stanc3/test/integration/good
                                 """
                             }
