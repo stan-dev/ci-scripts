@@ -228,8 +228,8 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
+                            label 'linux && triqs'
+                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -249,7 +249,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -269,7 +269,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -292,7 +292,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -313,7 +313,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -333,7 +333,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
