@@ -70,7 +70,7 @@ pipeline {
                 dockerfile {
                     filename 'docker/builder/Dockerfile'
                     dir '.'
-                    label 'linux'
+                    label 'linux && triqs'
                     args '--group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock'
                     additionalBuildArgs  '--build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g)'
                 }
@@ -365,8 +365,8 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always'
+                            label 'linux && triqs'
+                            args '--pull always'
                         }
                     }
                     steps {
@@ -417,8 +417,8 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always'
+                            label 'linux && triqs'
+                            args '--pull always'
                         }
                     }
                     steps {
