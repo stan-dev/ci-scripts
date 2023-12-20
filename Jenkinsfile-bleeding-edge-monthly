@@ -229,7 +229,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -250,7 +250,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -270,7 +270,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -293,7 +293,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -314,7 +314,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -334,7 +334,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
                             label 'linux'
-                            args '--group-add=987 --group-add=980 --group-add=988 --pull always --cap-add SYS_PTRACE'
+                            args '--group-add=987 --group-add=980 --group-add=988 --user=\$(id -u) --pull always --cap-add SYS_PTRACE'
                         }
                     }
                     steps {
@@ -469,15 +469,15 @@ pipeline {
         }
 
     }
-    post {
-        always {
-            node("linux") {
-                recordIssues enabledForFailure: false, tool: clang()
-            }
-        }
-        success { script { utils.mailBuildResults("SUCCESSFUL") } }
-        unstable { script { utils.mailBuildResults("UNSTABLE") } }
-        failure { script { utils.mailBuildResults("FAILURE") } }
-    }
+    // post {
+    //     always {
+    //         node("linux") {
+    //             recordIssues enabledForFailure: false, tool: clang()
+    //         }
+    //     }
+    //     success { script { utils.mailBuildResults("SUCCESSFUL") } }
+    //     unstable { script { utils.mailBuildResults("UNSTABLE") } }
+    //     failure { script { utils.mailBuildResults("FAILURE") } }
+    // }
 }
 
