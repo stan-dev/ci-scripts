@@ -33,47 +33,10 @@ def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" 
     sh "${cxx} --version"
 }
 
-def runPerformanceTests(String testsPath, String stancFlags = "", String compiler = "clang"){
-    unstash 'ubuntu-exe'
-
-    sh """
-        git clone --recursive --depth 50 https://github.com/stan-dev/performance-tests-cmdstan
-    """
-
-    utils.checkout_pr("cmdstan", "performance-tests-cmdstan/cmdstan", params.cmdstan_pr)
-    utils.checkout_pr("stan", "performance-tests-cmdstan/cmdstan/stan", params.stan_pr)
-    utils.checkout_pr("math", "performance-tests-cmdstan/cmdstan/stan/lib/stan_math", params.math_pr)
-
-    if (compiler == "gcc"){
-        setupMakeLocal("0","gcc","g++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
-    }
-    else if (compiler == "clang"){
-        setupMakeLocal("0","clang","clang++","","","", "-ltbb", "performance-tests-cmdstan/cmdstan/make/local")
-    }
-
-    sh """
-        cd performance-tests-cmdstan
-        mkdir cmdstan/bin
-        cp ../bin/stanc cmdstan/bin/linux-stanc
-        cd cmdstan; make clean-all;
-    """
-
-    if (stancFlags?.trim()) {
-        sh "cd performance-tests-cmdstan/cmdstan && echo 'STANCFLAGS= $stancFlags' >> make/local"
-    }
-
-    sh """
-        cd performance-tests-cmdstan/cmdstan
-        echo 'O=0' >> make/local
-        make -j${env.PARALLEL} build; cd ..
-        python3 runPerformanceTests.py -j${env.PARALLEL} --runs=0 ${testsPath}
-    """
-}
-
 pipeline {
     agent none
     options {
-        skipDefaultCheckout()
+
         preserveStashes(buildCount: 7)
     }
     parameters {
@@ -104,10 +67,12 @@ pipeline {
                 }
             }
             agent {
-                docker {
-                    image 'stanorg/stanc3:staticfi'
-                    label 'linux'
-                    args "--pull always --group-add=987 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock"
+                dockerfile {
+                    filename 'docker/builder/Dockerfile'
+                    dir '.'
+                    label 'linux && triqs'
+                    args '--group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock'
+                    additionalBuildArgs  '--build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g)'
                 }
             }
             environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
@@ -116,7 +81,7 @@ pipeline {
                     retry(3) { checkout scm }
                     sh """
                         cd docker/bleeding-edge-compilers
-                        docker build -t stanorg/ci:bleeding-edge-compilers --build-arg PUID=990 --build-arg PGID=986 .
+                        docker build -t stanorg/ci:bleeding-edge-compilers --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) .
                         docker login --username stanorg --password "${DOCKER_TOKEN}"
                         docker push stanorg/ci:bleeding-edge-compilers
                     """
@@ -131,14 +96,14 @@ pipeline {
 
         stage('Pull latest docker image') {
             parallel {
-                stage('Pull on v100') {
-                    agent { label 'linux && v100' }
+                stage('Pull on mesa') {
+                    agent { label 'linux && v100 && mesa' }
                     steps {
                         sh "docker pull stanorg/ci:bleeding-edge-compilers"
                     }
                 }
-                stage('Pull on k40') {
-                    agent { label 'linux && k40' }
+                stage('Pull on triqs') {
+                    agent { label 'linux && v100 && triqs' }
                     steps {
                         sh "docker pull stanorg/ci:bleeding-edge-compilers"
                     }
@@ -235,24 +200,20 @@ pipeline {
             }
         }
     
-        stage("Build Stanc3") {
+        stage("Get nightly Stanc3") {
             agent {
                 docker {
-                    image 'stanorg/stanc3:debianfi'
-                    //Forces image to ignore entrypoint
+                    image 'osexp2000/ubuntu-with-utils'
                     args "--entrypoint=\'\'"
                     label 'linux'
                 }
             }
             steps {
-                unstash "Stanc3Setup"
                 sh"""
-                    eval \$(opam env)
-                    dune build @install
+                    wget -O stanc https://github.com/stan-dev/stanc3/releases/download/nightly/linux-stanc && mkdir bin && mv stanc bin/
+                    chmod +x bin/stanc
                 """
-
-                sh "mkdir -p bin && mv _build/default/stanc3/src/stanc/stanc.exe bin/stanc"
-                stash name:'ubuntu-exe', includes:'bin/stanc, notes/working-models.txt'
+                stash name:'ubuntu-exe', includes:'bin/stanc'
             }
             post { always { sh "rm -rf ./*" }}
         }
@@ -267,7 +228,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -288,7 +249,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -308,7 +269,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -331,7 +292,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -352,7 +313,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -372,7 +333,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always --cap-add SYS_PTRACE'
                         }
                     }
@@ -404,7 +365,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always'
                         }
                     }
@@ -428,16 +389,14 @@ pipeline {
                                     echo "" >> all.tests
                                     cat shotgun_perf_all.tests >> all.tests
                                     cat all.tests
-                                    echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
-                                    pwd
                                     cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
-                                    pwd
                                     rm bin/stanc
                                     cp ../../bin/stanc bin/stanc
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
@@ -458,7 +417,7 @@ pipeline {
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
-                            label 'linux'
+                            label 'linux && triqs'
                             args '--pull always'
                         }
                     }
@@ -482,16 +441,14 @@ pipeline {
                                     echo "" >> all.tests
                                     cat shotgun_perf_all.tests >> all.tests
                                     cat all.tests
-                                    echo "PRECOMPILED_HEADERS=false" >> cmdstan/make/local
-                                    pwd
                                     cd cmdstan; make clean-all; git show HEAD --stat; make -j4 build
-                                    pwd
                                     rm bin/stanc
                                     cp ../../bin/stanc bin/stanc
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py --overwrite-golds --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
@@ -512,7 +469,6 @@ pipeline {
         }
 
     }
-
     post {
         always {
             node("linux") {
@@ -524,3 +480,4 @@ pipeline {
         failure { script { utils.mailBuildResults("FAILURE") } }
     }
 }
+
