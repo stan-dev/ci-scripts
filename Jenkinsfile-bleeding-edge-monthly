@@ -406,8 +406,8 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
-                                    ./runPerformanceTests.py --runs=0 ../stanc3/test/integration/good
+                                    ./runPerformanceTests.py -j${env.PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
@@ -458,8 +458,8 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
-                                    ./runPerformanceTests.py --runs=0 ../stanc3/test/integration/good
+                                    ./runPerformanceTests.py -j${env.PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
