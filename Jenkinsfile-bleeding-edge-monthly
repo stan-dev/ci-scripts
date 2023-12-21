@@ -36,19 +36,18 @@ def setupMakeLocal(String o = "3", String cc = "clang" , String cxx = "clang++" 
 pipeline {
     agent none
     options {
-
         preserveStashes(buildCount: 7)
     }
     parameters {
         booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
         string(defaultValue: 'develop', name: 'cmdstan_pr',
-               description: "CmdStan PR to test against. Will check out this PR in the downstream Stan repo.")
+               description: "CmdStan PR to test against. Will check out this PR in the downstream Stan repo. Example: PR-123")
         string(defaultValue: 'develop', name: 'stan_pr',
-               description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
+               description: "Stan PR to test against. Will check out this PR in the downstream Stan repo. Example: PR-123")
         string(defaultValue: 'develop', name: 'math_pr',
-               description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
+               description: "Math PR to test against. Will check out this PR in the downstream Math repo. Example: PR-123")
         string(defaultValue: 'master', name: 'stanc3_pr',
-               description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo.")
+               description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo. Example: PR-123")
         booleanParam(defaultValue: true, description: 'Run Full Unit Tests', name: 'run_full_unit_tests')
         booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
     }
@@ -125,7 +124,13 @@ pipeline {
                         rm -rf math
                         git clone https://github.com/stan-dev/math.git
                         cd math
-                        git checkout ${params.math_pr}
+                        if [[ "${params.math_pr}" == *"PR-"* ]]; then
+                            PRID=\$(echo "${params.math_pr}" | tr "-" "\n" | tail -1)
+                            git fetch origin pull/\$PRID/head:ci-branch
+                            git checkout ci-branch
+                        else
+                            git checkout "${params.math_pr}"
+                        fi
                         git clean -xffd
                     """
                     stash 'MathSetup'
@@ -186,7 +191,13 @@ pipeline {
                         git clone https://github.com/stan-dev/stanc3.git
                         cd stanc3
                         git submodule update --init --recursive
-                        git checkout ${params.stanc3_pr}
+                        if [[ "${params.stanc3_pr}" == *"PR-"* ]]; then
+                            PRID=\$(echo "${params.stanc3_pr}" | tr "-" "\n" | tail -1)
+                            git fetch origin pull/\$PRID/head:ci-branch
+                            git checkout ci-branch
+                        else
+                            git checkout "${params.stanc3_pr}"
+                        fi
                         git clean -xffd
                     """
 
