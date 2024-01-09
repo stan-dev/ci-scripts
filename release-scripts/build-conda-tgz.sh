@@ -25,5 +25,21 @@ python -c "from cmdstanpy import install_cmdstan; install_cmdstan(cores=2, progr
 cd $INSTALLATION_HOME/.cmdstan; tar -cf - cmdstan-$VERSION | gzip > $INSTALLATION_HOME/cmdstan-$VERSION.tgz
 tar -tzf $INSTALLATION_HOME/cmdstan-$VERSION.tgz | head
 
-# Use transfer.sh to upload our achive for easy retrieval
-curl --upload-file /root/cmdstan-$VERSION.tgz https://transfer.sh/cmdstan-$VERSION.tgz
+FILE="/root/cmdstan-$VERSION.tgz"
+URL="https://file.io"
+DEFAULT_EXPIRE="1d"
+
+RESPONSE=$(curl -# -F "file=@${FILE}" "${URL}/?expires=${EXPIRE}")
+
+RETURN=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->success;')
+
+if [ "1" != "$RETURN" ]; then
+    echo "An error occured!\nResponse: ${RESPONSE}"
+    exit 1
+fi
+
+KEY=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->key;')
+EXPIRY=$(echo "${RESPONSE}" | php -r 'echo json_decode(fgets(STDIN))->link;')
+
+echo "${URL}/${KEY}" | pbcopy # to clipboard
+echo "${URL}/${KEY}"  # to terminal
