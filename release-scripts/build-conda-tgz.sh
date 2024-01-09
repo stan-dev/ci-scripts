@@ -10,6 +10,9 @@
 # You can follow all the progress in the console, should take around 10 minutes
 # At the end the console will print a URL where you can download the .tgz archive
 
+# Install php
+!apt install php
+
 VERSION="$1"
 INSTALLATION_HOME="/root"
 
@@ -29,7 +32,7 @@ FILE="/root/cmdstan-$VERSION.tgz"
 URL="https://file.io"
 DEFAULT_EXPIRE="1d"
 
-RESPONSE=$(curl -# -F "file=@${FILE}" "${URL}/?expires=${EXPIRE}")
+RESPONSE=$(curl -# -H "Authorization: Bearer OX62KPZ.S2X6VZ1-887MCFB-QP0V6B0-1G7V5J1" -F "file=@${FILE}" "${URL}/?expires=${DEFAULT_EXPIRE}")
 
 RETURN=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->success;')
 
