@@ -11,7 +11,7 @@
 # At the end the console will print a URL where you can download the .tgz archive
 
 # Install php
-!apt install php
+apt install php
 
 VERSION="$1"
 INSTALLATION_HOME="/root"
