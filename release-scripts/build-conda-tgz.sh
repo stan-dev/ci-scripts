@@ -32,7 +32,7 @@ FILE="/root/cmdstan-$VERSION.tgz"
 URL="https://file.io"
 DEFAULT_EXPIRE="1d"
 
-RESPONSE=$(curl -# -H "Authorization: Bearer OX62KPZ.S2X6VZ1-887MCFB-QP0V6B0-1G7V5J1" -F "file=@${FILE}" "${URL}/?expires=${DEFAULT_EXPIRE}")
+RESPONSE=$(curl -# -F "file=@${FILE}" "${URL}/?expires=${DEFAULT_EXPIRE}")
 
 RETURN=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->success;')
 
