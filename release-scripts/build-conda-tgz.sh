@@ -44,5 +44,4 @@ fi
 KEY=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->key;')
 EXPIRY=$(echo "${RESPONSE}" | php -r 'echo json_decode(fgets(STDIN))->link;')
 
-echo "${URL}/${KEY}" | pbcopy # to clipboard
 echo "${URL}/${KEY}"  # to terminal
