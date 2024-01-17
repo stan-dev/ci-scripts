@@ -80,7 +80,7 @@ pipeline {
                     retry(3) { checkout scm }
                     sh """
                         cd docker/bleeding-edge-compilers
-                        docker build -t stanorg/ci:bleeding-edge-compilers --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) .
+                        docker build -t stanorg/ci:bleeding-edge-compilers --no-cache --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) .
                         docker login --username stanorg --password "${DOCKER_TOKEN}"
                         docker push stanorg/ci:bleeding-edge-compilers
                     """
