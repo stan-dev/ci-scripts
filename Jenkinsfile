@@ -21,7 +21,6 @@ def debianWindowsTag = ""
 pipeline {
     agent none
 	environment {
-		DOCKERHUB_CREDENTIALS=credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a')
 		GIT_URL="https://github.com/stan-dev/ci-scripts.git"
 		BRANCH_NAME="${params.ciscripts_branch}"
 	}
@@ -204,6 +203,7 @@ pipeline {
 
         stage("Build docker image") {
             agent { label 'linux && triqs' }
+            environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
             when {
                 beforeAgent true
                 expression { 
@@ -215,7 +215,7 @@ pipeline {
                     cleanCheckout()
                 }
                 sh """
-                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker login --username stanorg --password "${DOCKER_TOKEN}"
                     docker build -t stanorg/ci:$docs_docker_image_tag -f docker/docs/Dockerfile --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) .
                     docker push stanorg/ci:$docs_docker_image_tag
                 """
