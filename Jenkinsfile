@@ -33,6 +33,7 @@ pipeline {
         string(defaultValue: 'master', name: 'stanc3_branch', description: "Stanc3 branch to pull scripts")
         string(defaultValue: 'stan-dev', name: 'ciscripts_org', description: "Ci-scripts organization to pull Dockerfiles. You can also pass this to update main tags in DockerHub")
         string(defaultValue: 'master', name: 'ciscripts_branch', description: "Ci-scripts branch to pull Dockerfiles")
+        string(defaultValue: "", name: 'docs_docker_image_tag', description: "Tag to use for the docs docker image.")
 
         booleanParam(defaultValue: true, description: 'Build multi-arch docker image', name: 'buildMultiarch')
         booleanParam(defaultValue: true, description: 'Build static docker image', name: 'buildStatic')
@@ -197,6 +198,26 @@ pipeline {
 
                     docker tag stanorg/stanc3:debian-windows stanorg/stanc3:$debianWindowsTag
                     docker push stanorg/stanc3:debian-windows
+                """
+            }
+        }
+
+        stage("Build docker image") {
+            agent { label 'linux && triqs' }
+            when {
+                beforeAgent true
+                expression { 
+                    params.docs_docker_image_tag != ""
+                }
+            }
+            steps{
+                script {
+                    cleanCheckout()
+                }
+                sh """
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker build -t stanorg/ci:$docs_docker_image_tag -f docker/docs/Dockerfile --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) .
+                    docker push stanorg/ci:$docs_docker_image_tag
                 """
             }
         }
