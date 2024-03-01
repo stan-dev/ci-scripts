@@ -21,7 +21,7 @@ def debianWindowsTag = ""
 pipeline {
     agent none
 	environment {
-		DOCKERHUB_CREDENTIALS=credentials('acdd7926-9ee7-4f51-863f-14ee5bca1f4c')
+		DOCKERHUB_CREDENTIALS=credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a')
 		GIT_URL="https://github.com/stan-dev/ci-scripts.git"
 		BRANCH_NAME="${params.ciscripts_branch}"
 	}
