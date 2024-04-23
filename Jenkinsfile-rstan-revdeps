@@ -1,0 +1,67 @@
+#!/usr/bin/env groovy
+
+@Library('StanUtils')
+import org.stan.Utils
+
+utils = new org.stan.Utils()
+
+pipeline {
+    agent none
+    options {
+        skipDefaultCheckout()
+        preserveStashes(buildCount: 7)
+    }
+    parameters {
+        string(defaultValue: 'develop', name: 'stan_pr',
+               description: 'Stan PR to test against. Will check out this PR in the downstream Stan repo.')
+        string(defaultValue: 'nightly', name: 'stanc3_version',
+               description: 'Stanc3 PR to test against. Will check out this PR in the downstream Math repo.')
+    }
+    environment {
+        STAN_NUM_THREADS = 4
+        N_TESTS = 100
+        PARALLEL = 4
+        GCC = 'g++'
+    }
+    stages {
+        stage('Prim Unit Tests - GCC') {
+            agent {
+                dockerfile {
+                    filename 'docker/rstan-revdeps/Dockerfile'
+                    dir '.'
+                    label 'linux'
+                }
+            }
+            steps {
+                script {
+                    sh '''
+                    git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan
+                    '''
+                    utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
+                    sh "cd rstan/StanHeaders/inst/ && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
+
+                    sh '''
+                    cd rstan/StanHeaders/
+                    Rscript -e 'library(revdepcheck); revdep_check(num_workers = 4, quiet=FALSE, timeout=as.difftime(20, unit="mins")); revdep_report()'
+                    '''
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
+                    retry(3) { deleteDir() }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            node('linux') {
+                recordIssues enabledForFailure: false, tool: clang()
+            }
+        }
+        success { script { utils.mailBuildResults('SUCCESSFUL') } }
+        unstable { script { utils.mailBuildResults('UNSTABLE') } }
+        failure { script { utils.mailBuildResults('FAILURE') } }
+    }
+}
