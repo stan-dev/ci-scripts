@@ -8,7 +8,6 @@ utils = new org.stan.Utils()
 pipeline {
     agent none
     options {
-        skipDefaultCheckout()
         preserveStashes(buildCount: 7)
     }
     parameters {
@@ -24,7 +23,7 @@ pipeline {
         PARALLEL = 4
     }
     stages {
-        stage('Prim Unit Tests - GCC') {
+        stage('RStan revdeps') {
             agent {
                 dockerfile {
                     filename 'docker/rstan-revdeps/Dockerfile'
