@@ -21,6 +21,7 @@ pipeline {
     environment {
         TIMEOUT = 20
         PARALLEL = 4
+        CRANCACHE_DISABLE = 1
     }
     stages {
         stage('RStan revdeps') {
