@@ -8,7 +8,9 @@ utils = new org.stan.Utils()
 pipeline {
     agent none
     options {
-        preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
+        buildDiscarder(logRotator(numToKeepStr: '10', daysToKeepStr: '90'))
+        disableConcurrentBuilds(abortPrevious: true)
     }
     parameters {
         string(defaultValue: 'develop', name: 'rstan_branch',
@@ -56,14 +58,20 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
-                    Rscript -e "library(revdepcheck); revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins')); revdep_report()"
+                    Rscript -e "library(revdepcheck); revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
                     """
                 }
             }
             post {
                 always {
                     archiveArtifacts 'rstan/StanHeaders*.tar.gz'
+                    try {
+                        sh 'Rscript -e "library(revdepcheck); revdep_report()"'
+                    } catch (err) {
+                        echo 'Failed to generate revdep report'
+                    }
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
+                    archiveArtifacts 'rstan/StanHeaders/revdep/*/new/*.log'
                     retry(3) { deleteDir() }
                 }
             }
