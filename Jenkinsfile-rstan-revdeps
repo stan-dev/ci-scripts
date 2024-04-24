@@ -54,17 +54,15 @@ pipeline {
                     R CMD build "\$@" StanHeaders/ --no-manual --no-build-vignettes
                     """
 
-
                     sh """
-                    cd rstan
-                    ls
-                    export stanheadtargz=`find StanHeaders*.tar.gz | sort | tail -n 1`
+                    cd rstan/StanHeaders
                     Rscript -e "library(revdepcheck); revdep_check(pkg='\$stanheadtargz',num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins')); revdep_report()"
                     """
                 }
             }
             post {
                 always {
+                    archiveArtifacts 'rstan/StanHeaders*.tar.gz'
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
                     retry(3) { deleteDir() }
                 }
