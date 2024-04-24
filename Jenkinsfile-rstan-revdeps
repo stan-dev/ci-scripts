@@ -38,8 +38,9 @@ pipeline {
             }
             steps {
                 script {
-                    sh "pwd && mkdir -p ${env.R_LIBS_USER} && echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
-                    sh "Rscript -e '.libPaths()' && cat $HOME/.Renviron"
+                    sh "echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
+                    sh '''Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"'''
+
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     sh "cd rstan/StanHeaders/inst/ && rm -rf stanc.js && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
@@ -62,7 +63,6 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
-                    Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"
                     Rscript -e "revdepcheck::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
                     """
                 }
@@ -79,6 +79,7 @@ pipeline {
                     }
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
                     archiveArtifacts 'rstan/StanHeaders/revdep/checks/**/*.log'
+                    archiveArtifacts 'rstan/StanHeaders/revdep/checks/**/*.out'
                     retry(3) { deleteDir() }
                 }
             }
