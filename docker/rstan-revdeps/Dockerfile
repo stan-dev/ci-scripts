@@ -4,6 +4,3 @@ RUN apt-get update && apt-get install -y wget git r-base r-cran-remotes r-cran-v
 ENV LANG=C.UTF-8
 RUN Rscript -e 'remotes::install_github("r-lib/revdepcheck", update = "always")'
 
-USER jenkins
-WORKDIR /home/jenkins
-

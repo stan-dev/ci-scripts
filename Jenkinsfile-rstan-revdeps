@@ -24,20 +24,20 @@ pipeline {
         TIMEOUT = 40
         PARALLEL = 4
         CRANCACHE_DISABLE = 1
-        R_LIBS_USER='/home/jenkins/R/library'
+        HOME = "$WORKSPACE"
+        R_LIBS_USER='$WORKSPACE/R/library'
     }
     stages {
         stage('RStan revdeps') {
             agent {
                 dockerfile {
                     filename 'docker/rstan-revdeps/Dockerfile'
-                    dir '.'
                     label 'linux'
                 }
             }
             steps {
                 script {
-                    sh "pwd && mkdir -p R/library && Rscript -e '.libPaths()'"
+                    sh "pwd && mkdir -p ${env.R_LIBS_USER} && Rscript -e '.libPaths()'"
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     sh "cd rstan/StanHeaders/inst/ && rm -rf stanc.js && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
