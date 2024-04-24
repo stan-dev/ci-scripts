@@ -20,13 +20,7 @@ pipeline {
         string(defaultValue: 'nightly', name: 'stanc3_version',
                description: 'Stanc3 PR to test against. Will check out this PR in the downstream Math repo.')
     }
-    environment {
-        TIMEOUT = 40
-        PARALLEL = 4
-        CRANCACHE_DISABLE = 1
-        HOME = "$WORKSPACE"
-        R_LIBS_USER="$WORKSPACE/R/library"
-    }
+
     stages {
         stage('RStan revdeps') {
             agent {
@@ -34,6 +28,13 @@ pipeline {
                     filename 'docker/rstan-revdeps/Dockerfile'
                     label 'linux'
                 }
+            }
+            environment {
+                TIMEOUT = 40
+                PARALLEL = 4
+                CRANCACHE_DISABLE = 1
+                HOME = "$WORKSPACE"
+                R_LIBS_USER="$WORKSPACE/R/library"
             }
             steps {
                 script {
