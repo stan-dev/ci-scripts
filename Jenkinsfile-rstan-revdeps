@@ -73,7 +73,7 @@ pipeline {
                         }
                     }
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
-                    archiveArtifacts 'rstan/StanHeaders/revdep/*/new/*.log'
+                    archiveArtifacts 'rstan/StanHeaders/revdep/**/new/*.log'
                     retry(3) { deleteDir() }
                 }
             }
