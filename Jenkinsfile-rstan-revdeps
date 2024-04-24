@@ -36,7 +36,7 @@ pipeline {
                 script {
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
-                    sh "cd rstan/StanHeaders/inst/ && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
+                    sh "cd rstan/StanHeaders/inst/ && rm -rf stanc.js && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
                     // copied from rstan/sh_b.sh
                     sh """
                     cd rstan
@@ -59,7 +59,7 @@ pipeline {
                     cd rstan
                     ls
                     stanheadtargz=`find StanHeaders*.tar.gz | sort | tail -n 1`
-                    Rscript -e 'library(revdepcheck); revdep_check(pkg="$stanheadtargz",num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit="mins")); revdep_report()'
+                    Rscript -e 'library(revdepcheck); revdep_check(pkg="\$stanheadtargz",num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit="mins")); revdep_report()'
                     """
                 }
             }
