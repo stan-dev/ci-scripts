@@ -65,10 +65,12 @@ pipeline {
             post {
                 always {
                     archiveArtifacts 'rstan/StanHeaders*.tar.gz'
-                    try {
-                        sh 'Rscript -e "library(revdepcheck); revdep_report()"'
-                    } catch (err) {
-                        echo 'Failed to generate revdep report'
+                    script {
+                        try {
+                            sh 'Rscript -e "library(revdepcheck); revdep_report()"'
+                        } catch (err) {
+                            echo 'Failed to generate revdep report'
+                        }
                     }
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
                     archiveArtifacts 'rstan/StanHeaders/revdep/*/new/*.log'
