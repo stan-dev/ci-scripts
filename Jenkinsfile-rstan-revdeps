@@ -56,7 +56,7 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
-                    Rscript -e "library(revdepcheck); revdep_check(pkg='\$stanheadtargz',num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins')); revdep_report()"
+                    Rscript -e "library(revdepcheck); revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins')); revdep_report()"
                     """
                 }
             }
