@@ -19,7 +19,7 @@ pipeline {
                description: 'Stanc3 PR to test against. Will check out this PR in the downstream Math repo.')
     }
     environment {
-        TIMEOUT = 20
+        TIMEOUT = 40
         PARALLEL = 4
         CRANCACHE_DISABLE = 1
     }
@@ -37,10 +37,29 @@ pipeline {
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     sh "cd rstan/StanHeaders/inst/ && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
+                    // copied from rstan/sh_b.sh
+                    sh """
+                    cd rstan
+                    rm -Rf StanHeaders/inst/include/src \
+                        StanHeaders/inst/include/mathlib \
+                        StanHeaders/inst/include/stan \
+                        StanHeaders/inst/include/libsundials || true
+
+                    cp -Rf StanHeaders/inst/include/upstream/src StanHeaders/inst/include/src || true
+                    cp -Rf StanHeaders/inst/include/upstream/lib/stan_math StanHeaders/inst/include/mathlib || true
+                    cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/stan StanHeaders/inst/include/stan || true
+                    cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_* StanHeaders/inst/include/libsundials || true
+                    cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/include/* StanHeaders/inst/include/ || true
+                    cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/src/* StanHeaders/src/ || true
+                    R CMD build "$@" StanHeaders/ --no-manual --no-build-vignettes
+                    """
+
 
                     sh """
-                    cd rstan/StanHeaders/
-                    Rscript -e 'library(revdepcheck); revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit="mins")); revdep_report()'
+                    cd rstan
+                    ls
+                    stanheadtargz=`find StanHeaders*.tar.gz | sort | tail -n 1`
+                    Rscript -e 'library(revdepcheck); revdep_check(pkg="$stanheadtargz",num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit="mins")); revdep_report()'
                     """
                 }
             }
