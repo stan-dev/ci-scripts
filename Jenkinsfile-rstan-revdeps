@@ -58,7 +58,7 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
-                    Rscript -e "library(revdepcheck); revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
+                    Rscript -e "revdepcheck::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
                     """
                 }
             }
@@ -67,7 +67,7 @@ pipeline {
                     archiveArtifacts 'rstan/StanHeaders*.tar.gz'
                     script {
                         try {
-                            sh 'Rscript -e "library(revdepcheck); revdep_report()"'
+                            sh 'cd rstan/StanHeaders && Rscript -e "revdepcheck::revdep_report()"'
                         } catch (err) {
                             echo 'Failed to generate revdep report'
                         }
