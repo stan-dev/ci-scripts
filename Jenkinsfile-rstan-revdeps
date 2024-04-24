@@ -51,7 +51,7 @@ pipeline {
                     cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_* StanHeaders/inst/include/libsundials || true
                     cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/include/* StanHeaders/inst/include/ || true
                     cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/src/* StanHeaders/src/ || true
-                    R CMD build "$@" StanHeaders/ --no-manual --no-build-vignettes
+                    R CMD build "\$@" StanHeaders/ --no-manual --no-build-vignettes
                     """
 
 
