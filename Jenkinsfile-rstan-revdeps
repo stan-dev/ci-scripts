@@ -24,6 +24,7 @@ pipeline {
         TIMEOUT = 40
         PARALLEL = 4
         CRANCACHE_DISABLE = 1
+        R_LIBS_USER='/build/revdeps/R/library'
     }
     stages {
         stage('RStan revdeps') {
