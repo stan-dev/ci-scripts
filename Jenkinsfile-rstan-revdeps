@@ -24,7 +24,7 @@ pipeline {
         TIMEOUT = 40
         PARALLEL = 4
         CRANCACHE_DISABLE = 1
-        R_LIBS_USER='/build/revdeps/R/library'
+        R_LIBS_USER='/build/revdeps/R/library/'
     }
     stages {
         stage('RStan revdeps') {
@@ -37,6 +37,7 @@ pipeline {
             }
             steps {
                 script {
+                    sh "export R_LIBS_USER=${env.R_LIBS_USER}"
                     sh "mkdir -p R/library && Rscript -e '.libPaths()'"
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
