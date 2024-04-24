@@ -39,6 +39,7 @@ pipeline {
             steps {
                 script {
                     sh "echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
+                    sh "Rscript -e '.libPaths()' && cat $HOME/.Renviron"
                     sh '''Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"'''
 
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
