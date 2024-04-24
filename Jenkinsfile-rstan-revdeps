@@ -38,7 +38,7 @@ pipeline {
             }
             steps {
                 script {
-                    sh "echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
+                    sh "pwd && mkdir -p ${env.R_LIBS_USER} && echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
                     sh "Rscript -e '.libPaths()' && cat $HOME/.Renviron"
                     sh '''Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"'''
 
