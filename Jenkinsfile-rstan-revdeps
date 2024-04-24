@@ -58,6 +58,7 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
+                    Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"
                     Rscript -e "revdepcheck::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
                     """
                 }
@@ -73,7 +74,7 @@ pipeline {
                         }
                     }
                     archiveArtifacts 'rstan/StanHeaders/revdep/*.md'
-                    archiveArtifacts 'rstan/StanHeaders/revdep/checks/**/new/*.log'
+                    archiveArtifacts 'rstan/StanHeaders/revdep/checks/**/*.log'
                     retry(3) { deleteDir() }
                 }
             }
