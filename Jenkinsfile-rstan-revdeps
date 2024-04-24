@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     sh "pwd && mkdir -p ${env.R_LIBS_USER} && echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
-                    sh "Rscript -e ".libPaths()" && cat $HOME/.Renviron"
+                    sh "Rscript -e '.libPaths()' && cat $HOME/.Renviron"
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     sh "cd rstan/StanHeaders/inst/ && rm -rf stanc.js && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
