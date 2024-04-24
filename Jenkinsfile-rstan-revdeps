@@ -37,7 +37,6 @@ pipeline {
             }
             steps {
                 script {
-                    sh "export R_LIBS_USER=${env.R_LIBS_USER}"
                     sh "mkdir -p R/library && Rscript -e '.libPaths()'"
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
@@ -61,8 +60,8 @@ pipeline {
 
                     sh """
                     cd rstan/StanHeaders
-                    Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"
-                    Rscript -e "revdepcheck::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
+                    R_LIBS_USER=${env.R_LIBS_USER} Rscript -e "install.packages('rstan', repos='https://cloud.r-project.org', dependencies=TRUE)"
+                    R_LIBS_USER=${env.R_LIBS_USER} Rscript -e "revdepcheck::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
                     """
                 }
             }
