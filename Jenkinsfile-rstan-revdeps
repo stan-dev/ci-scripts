@@ -36,6 +36,7 @@ pipeline {
                 R_LIBS_USER="$WORKSPACE/R/library"
                 MAKEFLAGS = "-j2"
                 R_REVDEPCHECK_NUM_WORKERS="${env.PARALLEL}"
+                R_REVDEPCHECK_TIMEOUT="${env.TIMEOUT}"
             }
             steps {
                 script {
@@ -43,8 +44,6 @@ pipeline {
                     sh '''Rscript -e "install.packages(c('rstan', 'rstantools'), repos='https://cloud.r-project.org', dependencies=TRUE)"'''
 
                     sh "git clone --recursive --depth 1 --shallow-submodules https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
-                    sh '''cd rstan/rstan && Rscript -e "install.packages(getwd(), repos=NULL, type='source')"'''
-
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     sh "cd rstan/StanHeaders/inst/ && rm -rf stanc.js && wget https://github.com/stan-dev/stanc3/releases/download/${params.stanc3_version}/stanc.js"
                     // copied from rstan/sh_b.sh
@@ -64,11 +63,13 @@ pipeline {
                     R CMD build "\$@" StanHeaders/ --no-manual --no-build-vignettes
                     """
 
-                    sh """
+                    sh '''cd rstan/rstan/rstan && Rscript -e "install.packages(getwd(), repos=NULL, type='source')"'''
+                    sh '''cd rstan/StanHeaders && Rscript -e "revdepcheck.extras::revdep_precache()"'''
+
+                    sh '''
                     cd rstan/StanHeaders
-                    Rscript -e "revdepcheck.extras::revdep_precache()"
-                    Rscript -e "revdepcheck.extras::revdep_check(num_workers=${env.PARALLEL}, quiet=FALSE, timeout=as.difftime(${env.TIMEOUT}, unit='mins'))"
-                    """
+                    Rscript -e "revdepcheck.extras::revdep_check(bioc=TRUE, quiet=FALSE)"
+                    '''
                 }
             }
             post {
