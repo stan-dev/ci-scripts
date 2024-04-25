@@ -65,7 +65,7 @@ pipeline {
                     cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/include/* StanHeaders/inst/include/ || true
                     cp -Rf StanHeaders/inst/include/upstream/lib/stan_math/lib/sundials_*/src/* StanHeaders/src/ || true
                     R CMD build "\$@" StanHeaders/ --no-manual --no-build-vignettes
-                    Rscript -e "install.packages(getwd(), repos=NULL, type='source')"
+                    Rscript -e "remove.packages('rstan'); remove.packages('StanHeaders'); install.packages(getwd(), repos=NULL, type='source')"
                     """
                     sh '''cd rstan/rstan/rstan && Rscript -e "install.packages(getwd(), repos=NULL, type='source')"'''
                     sh '''cd rstan/StanHeaders && Rscript -e "revdepcheck.extras::revdep_precache()"'''
