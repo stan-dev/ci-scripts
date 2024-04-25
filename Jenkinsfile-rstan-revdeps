@@ -35,7 +35,7 @@ pipeline {
                 HOME = "$WORKSPACE"
                 R_LIBS_USER="$WORKSPACE/R/library"
                 MAKEFLAGS = "-j2"
-                R_REVDEPCHECK_NUM_WORKERS=${env.PARALLEL}
+                R_REVDEPCHECK_NUM_WORKERS="${env.PARALLEL}"
             }
             steps {
                 script {
