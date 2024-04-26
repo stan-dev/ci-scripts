@@ -73,7 +73,7 @@ pipeline {
 
                     sh '''
                     cd rstan/StanHeaders
-                    Rscript -e "revdepcheck.extras::revdep_check(bioc=TRUE, quiet=FALSE)"
+                    Rscript -e "revdepcheck.extras::check(bioc=TRUE)"
                     '''
                 }
             }
