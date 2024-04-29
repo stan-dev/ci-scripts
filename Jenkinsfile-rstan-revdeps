@@ -69,7 +69,8 @@ pipeline {
 
                     sh '''cd rstan/StanHeaders&& Rscript -e "remove.packages('rstan'); remove.packages('StanHeaders'); install.packages(getwd(), repos=NULL, type='source')"'''
                     sh '''cd rstan/rstan/rstan && Rscript -e "install.packages(getwd(), repos=NULL, type='source')"'''
-                    sh "cd rstan/StanHeaders && Rscript -e 'options(Ncpus=${env.PARALLEL}); revdepcheck.extras::revdep_precache()'"
+
+                    // sh "cd rstan/StanHeaders && Rscript -e 'options(Ncpus=${env.PARALLEL}); revdepcheck.extras::revdep_precache()'"
 
                     sh '''
                     cd rstan/StanHeaders
