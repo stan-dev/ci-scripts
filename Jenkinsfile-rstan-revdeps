@@ -45,7 +45,7 @@ pipeline {
                     sh "mkdir -p ${env.R_LIBS_USER} && echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
 
                     sh "git clone --recursive --depth 50 https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
-                    sh "cd rstan/StanHeaders/inst/include/upstream && git fetch && ls && git branch --remotes"
+                    sh "cd rstan/StanHeaders/inst/include/upstream && git pull && ls && git branch --remotes"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     utils.checkout_pr("math", "rstan/StanHeaders/inst/include/upstream/lib/stan_math", params.math_pr)
 
