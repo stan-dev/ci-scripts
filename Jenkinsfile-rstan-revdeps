@@ -20,7 +20,7 @@ pipeline {
         string(defaultValue: 'develop', name: 'math_pr',
                description: 'Math PR to test against. Will check out this PR in the downstream Math repo.')
         string(defaultValue: 'nightly', name: 'stanc3_version',
-               description: 'Stanc3 version to test against. Will check download this release into StanHeaders.')
+               description: 'Stanc3 version to test against. Will download this release into StanHeaders.')
     }
 
     stages {
@@ -43,9 +43,9 @@ pipeline {
             steps {
                 script {
                     sh "mkdir -p ${env.R_LIBS_USER} && echo 'R_LIBS_USER=\"${env.R_LIBS_USER}\"' > $HOME/.Renviron"
-                    sh '''Rscript -e "install.packages(c('rstan', 'rstantools'), repos='https://cloud.r-project.org', dependencies=TRUE)"'''
 
                     sh "git clone --recursive --depth 50 https://github.com/stan-dev/rstan --branch ${params.rstan_branch}"
+                    sh "cd rstan/StanHeaders/inst/include/upstream && git branch --remotes"
                     utils.checkout_pr('stan', 'rstan/StanHeaders/inst/include/upstream', params.stan_pr)
                     utils.checkout_pr("math", "rstan/StanHeaders/inst/include/upstream/lib/stan_math", params.math_pr)
 
@@ -67,6 +67,7 @@ pipeline {
                     R CMD build "\$@" StanHeaders/ --no-manual --no-build-vignettes
                     """
 
+                    sh '''Rscript -e "crancache::install_packages(c('rstan', 'rstantools'), repos='https://cloud.r-project.org', dependencies=TRUE)"'''
                     sh '''cd rstan/StanHeaders&& Rscript -e "remove.packages('rstan'); remove.packages('StanHeaders'); install.packages(getwd(), repos=NULL, type='source')"'''
                     sh '''cd rstan/rstan/rstan && Rscript -e "install.packages(getwd(), repos=NULL, type='source')"'''
 
