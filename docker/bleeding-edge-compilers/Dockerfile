@@ -1,5 +1,5 @@
-# Base image, use lunar so we can install latest gcc from the ppa
-FROM ubuntu:lunar
+# Base image, use latest so we can install latest gcc from the ppa
+FROM ubuntu:rolling
 
 USER root
 
