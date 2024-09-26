@@ -73,7 +73,7 @@ pipeline {
                     dir '.'
                     label 'linux && triqs'
                     args '--group-add=987 --group-add=980 --group-add=988 --entrypoint=\'\' -v /var/run/docker.sock:/var/run/docker.sock'
-                    additionalBuildArgs '--build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) --build-arg CUSTOM_GCC_TAG=\${params.custom_gcc_tag} --build-arg CUSTOM_LLVM_TAG=\${params.custom_llvm_tag}'
+                    additionalBuildArgs '--build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) --build-arg CUSTOM_GCC_TAG=\${custom_gcc_tag} --build-arg CUSTOM_LLVM_TAG=\${custom_llvm_tag}'
                 }
             }
             environment { DOCKER_TOKEN = credentials('aada4f7b-baa9-49cf-ac97-5490620fce8a') }
