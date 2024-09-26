@@ -22,7 +22,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 # Install latest gcc, g++ from ubuntu toolchain ppa
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 # https://gcc.gnu.org/releases.html
-RUN if [ -z "$CUSTOM_GCC_TAG" ] ; then LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq '.[]|select(.name | startswith("releases/gcc-"))' | jq '.name' | head -1 | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+'); else LATEST_RELEASE="${CUSTOM_GCC_TAG}" ; fi; && \
+RUN if [ -z "$CUSTOM_GCC_TAG" ] ; then LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq '.[]|select(.name | startswith("releases/gcc-"))' | jq '.name' | head -1 | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+'); else LATEST_RELEASE="${CUSTOM_GCC_TAG}" ; fi && \
     echo $LATEST_RELEASE && \
     major=$(echo $LATEST_RELEASE | cut -d. -f1) && \
     add-apt-repository ppa:ubuntu-toolchain-r/test -y && apt-get update -y && apt-get install gcc-${major} g++-${major} -y && \
@@ -46,7 +46,7 @@ ENV PATH=$clangbuild/bin:$PATH
 ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
 
 # Download the source code, build & install libcxx
-RUN if [ -z "CUSTOM_LLVM_TAG" ] ; then LATEST_RELEASE_VERSION=$(curl https://api.github.com/repos/llvm/llvm-project/tags | jq '.[]|select(.name | startswith("llvmorg-"))' | jq '.name' | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1 ) ; else LATEST_RELEASE_VERSION="${CUSTOM_LLVM_TAG}" ; fi; && \
+RUN if [ -z "CUSTOM_LLVM_TAG" ] ; then LATEST_RELEASE_VERSION=$(curl https://api.github.com/repos/llvm/llvm-project/tags | jq '.[]|select(.name | startswith("llvmorg-"))' | jq '.name' | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1 ) ; else LATEST_RELEASE_VERSION="${CUSTOM_LLVM_TAG}" ; fi && \
     echo $LATEST_RELEASE_VERSION && \
     git clone -b "llvmorg-${LATEST_RELEASE_VERSION}" --depth=1 https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
