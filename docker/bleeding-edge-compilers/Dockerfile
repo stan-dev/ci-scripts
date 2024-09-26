@@ -46,7 +46,6 @@ ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
 
 # Download the source code, build & install libcxx
 RUN if [ -z "CUSTOM_LLVM_TAG" ] ; then LATEST_RELEASE_VERSION=$(curl https://api.github.com/repos/llvm/llvm-project/tags | jq '.[]|select(.name | startswith("llvmorg-"))' | jq '.name' | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1 ) ; else LATEST_RELEASE_VERSION="${CUSTOM_LLVM_TAG}" ; fi && \
-    echo $LATEST_RELEASE_VERSION && \
     git clone -b "llvmorg-${LATEST_RELEASE_VERSION}" --depth=1 https://github.com/llvm/llvm-project.git && \
     cd llvm-project && \
     mkdir build && cd build && \
