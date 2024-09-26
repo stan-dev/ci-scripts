@@ -9,6 +9,9 @@ ARG PGID
 ARG CUSTOM_GCC_TAG
 ARG CUSTOM_LLVM_TAG
 
+RUN echo "$CUSTOM_GCC_TAG"
+RUN echo "$CUSTOM_LLVM_TAG"
+
 ENV TZ="America/New_York"
 
 # Install OS depdencies
