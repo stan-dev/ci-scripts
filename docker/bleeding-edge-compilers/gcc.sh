@@ -1,9 +1,13 @@
 #!/bin/bash
 
+echo "${CUSTOM_GCC_TAG}"
+
 if [ -z "$CUSTOM_GCC_TAG" ]; then
   LATEST_RELEASE=$(curl https://api.github.com/repos/gcc-mirror/gcc/tags | jq '.[]|select(.name | startswith("releases/gcc-"))' | jq '.name' | head -1 | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+')
+  echo "Pulling latest release ${LATEST_RELEASE}"
 else
   LATEST_RELEASE="${CUSTOM_GCC_TAG}"
+  echo "Using custom release tag ${LATEST_RELEASE}"
 fi
 
 echo "${LATEST_RELEASE}"

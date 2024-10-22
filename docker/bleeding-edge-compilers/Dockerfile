@@ -25,14 +25,18 @@ RUN apt-get update -y && apt-get install wget git curl xz-utils build-essential 
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget  \
     libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev -y
 
+COPY gcc.sh /tmp/gcc.sh
+COPY llvm.sh /tmp/llvm.sh
+
+RUN chmod +x /tmp/gcc.sh && chmod +x /tmp/llvm.sh
+
 RUN ln -sf python3 /usr/bin/python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 # Install latest gcc, g++ from ubuntu toolchain ppa
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 # https://gcc.gnu.org/releases.html
-COPY gcc.sh /tmp/gcc.sh
-RUN if [ -n "$BUILD_GCC" ]; then chmod +x /tmp/gcc.sh && /tmp/gcc.sh; fi
+RUN if [ -n "$BUILD_GCC" ]; then /tmp/gcc.sh; fi
 
 # Add Jenkins user and group
 RUN addgroup -gid ${PGID} jenkins
@@ -49,8 +53,7 @@ ENV PATH=$clangbuild/bin:$PATH
 ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
 
 # Download the source code, build & install libcxx
-COPY llvm.sh /tmp/llvm.sh
-RUN if [ -n "$BUILD_LLVM" ]; then chmod +x /tmp/llvm.sh && /tmp/llvm.sh; fi
+RUN if [ -n "$BUILD_LLVM" ]; then /tmp/llvm.sh; fi
 
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"

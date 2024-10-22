@@ -1,7 +1,13 @@
-if [ -z "CUSTOM_LLVM_TAG" ]; then
+#!/bin/bash
+
+echo "${CUSTOM_LLVM_TAG}"
+
+if [ -z "$CUSTOM_LLVM_TAG" ]; then
   LATEST_RELEASE_VERSION=$(curl https://api.github.com/repos/llvm/llvm-project/tags | jq '.[]|select(.name | startswith("llvmorg-"))' | jq '.name' | grep -Eo '[0-9][0-9]\.[0-9]\.[0-9]+' | head -1 )
+  echo "Pulling latest release ${LATEST_RELEASE_VERSION}"
 else
   LATEST_RELEASE_VERSION="${CUSTOM_LLVM_TAG}"
+  echo "Using custom release tag ${LATEST_RELEASE_VERSION}"
 fi
 
 echo "${LATEST_RELEASE_VERSION}"
