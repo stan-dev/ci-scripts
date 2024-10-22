@@ -1,5 +1,5 @@
 # Base image, use latest so we can install latest gcc from the ppa
-FROM ubuntu:rolling
+FROM ubuntu:24.10
 
 USER root
 

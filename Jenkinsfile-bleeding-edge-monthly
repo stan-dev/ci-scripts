@@ -482,15 +482,15 @@ pipeline {
         }
 
     }
-    post {
-        always {
-            node("linux") {
-                recordIssues enabledForFailure: false, tool: clang()
-            }
-        }
-        success { script { utils.mailBuildResults("SUCCESSFUL") } }
-        unstable { script { utils.mailBuildResults("UNSTABLE") } }
-        failure { script { utils.mailBuildResults("FAILURE") } }
-    }
+    //post {
+    //    always {
+    //        node("linux") {
+    //            recordIssues enabledForFailure: false, tool: clang()
+    //        }
+    //   }
+    //    success { script { utils.mailBuildResults("SUCCESSFUL") } }
+    //    unstable { script { utils.mailBuildResults("UNSTABLE") } }
+    //    failure { script { utils.mailBuildResults("FAILURE") } }
+    //}
 }
 
