@@ -32,7 +32,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 # https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test
 # https://gcc.gnu.org/releases.html
 COPY gcc.sh /tmp/gcc.sh
-RUN if [ -n "$BUILD_GCC" ]; then /tmp/gcc.sh; fi
+RUN if [ -n "$BUILD_GCC" ]; then chmod +x /tmp/gcc.sh && /tmp/gcc.sh; fi
 
 # Add Jenkins user and group
 RUN addgroup -gid ${PGID} jenkins
@@ -50,7 +50,7 @@ ENV LD_LIBRARY_PATH=$clangbuild/lib:$LD_LIBRARY_PATH
 
 # Download the source code, build & install libcxx
 COPY llvm.sh /tmp/llvm.sh
-RUN if [ -n "$BUILD_LLVM" ]; then /tmp/llvm.sh; fi
+RUN if [ -n "$BUILD_LLVM" ]; then chmod +x /tmp/llvm.sh && /tmp/llvm.sh; fi
 
 # Update LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH="/usr/local/lib:${PATH}"

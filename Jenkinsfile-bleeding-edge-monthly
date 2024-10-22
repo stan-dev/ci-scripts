@@ -52,8 +52,8 @@ pipeline {
         booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
         string(name: 'custom_gcc_tag', description: "Example: 13.3.0 | See: https://api.github.com/repos/gcc-mirror/gcc/tags")
         string(name: 'custom_llvm_tag', description: "Example: 19.1.0-rc4 | See: https://api.github.com/repos/llvm/llvm-project/tags")
-        booleanParam(name: 'build_gcc', description: "Build gcc part ?")
-        booleanParam(name: 'build_llvm', description: "build llvm part ?")
+        booleanParam(defaultValue: true, name: 'build_gcc', description: "Build gcc part ?")
+        booleanParam(defaultValue: true, name: 'build_llvm', description: "build llvm part ?")
     }
     environment {
         STAN_NUM_THREADS = 4
