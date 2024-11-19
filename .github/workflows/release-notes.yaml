@@ -6,7 +6,7 @@ on:
       last-date:
         description: 'Last release date'
         required: true
-        default: '2021-01-01'
+        default: '2024-01-01'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -15,7 +15,7 @@ jobs:
   get-notes:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Create Stanc3 notes
       run: python release-scripts/release-notes.py stanc3 --time ${{ inputs.last-date }} > stanc3.txt
     - name: Create CmdStan notes
@@ -25,7 +25,7 @@ jobs:
     - name: Create Stan notes
       run: python release-scripts/release-notes.py stan > stan.txt
     - name: Upload
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-notes
         path: |
