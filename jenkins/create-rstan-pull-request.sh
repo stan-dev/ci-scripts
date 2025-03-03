@@ -34,7 +34,7 @@ pushd StanHeaders/inst/include/upstream > /dev/null
 git checkout ${stan_commit_hash}
 popd > /dev/null
 git add StanHeaders/inst/include/upstream
-git commit -m "Updates the Stan submodule to ${stan_commit_hash}." stan
+git commit -m "Updates the Stan submodule to ${stan_commit_hash}." StanHeaders/inst/include/upstream
 git push origin develop
 
 trap : 0
