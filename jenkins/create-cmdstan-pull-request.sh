@@ -6,13 +6,13 @@ set -e
 
 git checkout develop
 git pull origin
-make stan-revert
+git submodule update --init --recursive
 pushd stan > /dev/null
 git checkout develop
 git pull origin
-make math-revert
+git submodule update --init --recursive
 popd > /dev/null
-make stan-revert
+git submodule update --init --recursive
 
 original_commit_hash=$(cd stan && git rev-parse --short HEAD)
 stan_commit_hash=$(cd stan && git rev-parse --short origin/develop)
@@ -27,7 +27,7 @@ if [ "$original_commit_hash" == "$stan_commit_hash" ]; then
   echo ""
   echo "------------------------------------------------------------"
   echo ""
-  trap : 0 
+  trap : 0
   exit 0
 fi
 
@@ -38,7 +38,7 @@ git add stan
 git commit -m "Updates the Stan submodule to ${stan_commit_hash}." stan
 git push origin develop
 
-trap : 0 
+trap : 0
 
 echo "------------------------------------------------------------"
 echo ""
