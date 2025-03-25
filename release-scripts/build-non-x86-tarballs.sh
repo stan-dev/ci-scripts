@@ -8,7 +8,7 @@ fi
 VERSION=$1 #should be in MAJOR.MINOR.PATCH form
 X86URL="https://github.com/stan-dev/cmdstan/releases/download/v${VERSION}/cmdstan-${VERSION}.tar.gz"
 X64TARBALL="cmdstan-${VERSION}.tar.gz"
-ARCHS=("arm64" "armel" "armhf" "mips64el" "ppc64el" "s390x")
+ARCHS=("arm64" "armel" "armhf" "ppc64el" "s390x")
 
 rm -Rf build
 mkdir -p build
