@@ -20,12 +20,12 @@ echo ""
 
 git checkout develop
 git pull origin
-make math-revert
+git submodule update --init --recursive
 pushd lib/stan_math > /dev/null
 git checkout develop
 git pull origin
 popd > /dev/null
-make math-revert
+git submodule update --init --recursive
 
 original_commit_hash=$(cd lib/stan_math && git rev-parse --short HEAD)
 math_commit_hash=$(cd lib/stan_math && git rev-parse --short origin/develop)
@@ -39,7 +39,7 @@ if [ "$original_commit_hash" == "$math_commit_hash" ]; then
   echo ""
   echo "------------------------------------------------------------"
   echo ""
-  trap : 0 
+  trap : 0
   exit 0
 fi
 
@@ -54,7 +54,7 @@ git push origin develop
 ## Done
 ########################################
 
-trap : 0 
+trap : 0
 
 echo "------------------------------------------------------------"
 echo ""
