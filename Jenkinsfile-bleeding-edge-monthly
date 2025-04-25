@@ -84,7 +84,7 @@ pipeline {
                     retry(3) { checkout scm }
                     sh """
                         cd docker/bleeding-edge-compilers
-                        docker build -t stanorg/ci:bleeding-edge-compilers --no-cache --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) --build-arg CUSTOM_GCC_TAG=\${custom_gcc_tag} --build-arg CUSTOM_LLVM_TAG=\${custom_llvm_tag} --build-arg BUILD_LLVM=\${build_gcc} --build-arg BUILD_LLVM=\${build_llvm} .
+                        docker build -t stanorg/ci:bleeding-edge-compilers --no-cache --build-arg PUID=\$(id -u) --build-arg PGID=\$(id -g) --build-arg CUSTOM_GCC_TAG=\${custom_gcc_tag} --build-arg CUSTOM_LLVM_TAG=\${custom_llvm_tag} --build-arg BUILD_GCC=\${build_gcc} --build-arg BUILD_LLVM=\${build_llvm} .
                         docker login --username stanorg --password "${DOCKER_TOKEN}"
                         docker push stanorg/ci:bleeding-edge-compilers
                     """
@@ -214,7 +214,7 @@ pipeline {
                 }
             }
         }
-    
+
         stage("Get nightly Stanc3") {
             agent {
                 docker {
