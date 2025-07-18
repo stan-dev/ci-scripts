@@ -8,9 +8,9 @@ utils = new org.stan.Utils()
 def runTests(String testPath, boolean jumbo = false) {
     try {
         if (jumbo && !params.disableJumbo) {
-            sh "python3 runTests.py -j${env.PARALLEL} ${testPath} --jumbo --debug"
+            sh "python3 runTests.py -j${PARALLEL} ${testPath} --jumbo --debug"
         } else {
-            sh "python3 runTests.py -j${env.PARALLEL} ${testPath}"
+            sh "python3 runTests.py -j${PARALLEL} ${testPath}"
         }
     }
     finally { junit 'test/**/*.xml' }
@@ -39,7 +39,6 @@ pipeline {
         preserveStashes(buildCount: 7)
     }
     parameters {
-        booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
         string(defaultValue: 'develop', name: 'cmdstan_pr',
                description: "CmdStan PR to test against. Will check out this PR in the downstream Stan repo. Example: PR-123")
         string(defaultValue: 'develop', name: 'stan_pr',
@@ -48,17 +47,21 @@ pipeline {
                description: "Math PR to test against. Will check out this PR in the downstream Math repo. Example: PR-123")
         string(defaultValue: 'master', name: 'stanc3_pr',
                description: "Stanc3 PR to test against. Will check out this PR in the downstream Math repo. Example: PR-123")
+        booleanParam(defaultValue: true, name: 'run_gcc', description: "Run GCC?")
+        booleanParam(defaultValue: true, name: 'run_clang', description: "Run clang?")
         booleanParam(defaultValue: true, description: 'Run Full Unit Tests', name: 'run_full_unit_tests')
         booleanParam(defaultValue: true, description: 'Run CmdStan & Math tests', name: 'run_cmdstan_math_tests')
-        string(name: 'custom_gcc_tag', description: "Example: 13.3.0 | See: https://api.github.com/repos/gcc-mirror/gcc/tags")
-        string(name: 'custom_llvm_tag', description: "Example: 19.1.0-rc4 | See: https://api.github.com/repos/llvm/llvm-project/tags")
+
+        booleanParam(defaultValue: false, name: 'buildDocker', description: 'Build docker image with latest gcc, clang')
         booleanParam(defaultValue: true, name: 'build_gcc', description: "Build gcc part ?")
+        string(name: 'custom_gcc_tag', description: "Example: 13.3.0 | See: https://api.github.com/repos/gcc-mirror/gcc/tags")
         booleanParam(defaultValue: true, name: 'build_llvm', description: "build llvm part ?")
+        string(name: 'custom_llvm_tag', description: "Example: 19.1.0-rc4 | See: https://api.github.com/repos/llvm/llvm-project/tags")
+
     }
     environment {
         STAN_NUM_THREADS = 4
         N_TESTS = 100
-        PARALLEL = 4
         GCC = 'g++'
     }
     stages {
@@ -240,6 +243,12 @@ pipeline {
             }
             parallel {
                 stage('Rev/Fwd Unit Tests - CLANG') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_clang
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -261,6 +270,12 @@ pipeline {
                     post { always { retry(3) { deleteDir() } } }
                 }
                 stage('Mix Unit Tests - CLANG') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_clang
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -281,6 +296,12 @@ pipeline {
                     post { always { retry(3) { deleteDir() } } }
                 }
                 stage('Prim Unit Tests - CLANG') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_clang
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -304,6 +325,12 @@ pipeline {
                     post { always { retry(3) { deleteDir() } } }
                 }
                 stage('Rev/Fwd Unit Tests - GCC') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_gcc
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -325,6 +352,12 @@ pipeline {
                     post { always { retry(3) { deleteDir() } } }
                 }
                 stage('Mix Unit Tests - GCC') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_gcc
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -345,6 +378,12 @@ pipeline {
                     post { always { retry(3) { deleteDir() } } }
                 }
                 stage('Prim Unit Tests - GCC') {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_gcc
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -377,6 +416,12 @@ pipeline {
             }
             parallel {
                 stage("Model end-to-end - CLANG") {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_clang
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -410,8 +455,8 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py -j${env.PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
-                                    ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 ../stanc3/test/integration/good
+                                    ./runPerformanceTests.py -j${PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py -j${PARALLEL} --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
@@ -429,6 +474,12 @@ pipeline {
                     post { always { sh "rm -rf ${env.WORKSPACE}/compile-end-to-end-O=1/*" }}
                 }
                 stage("Model end-to-end - GCC") {
+                    when {
+                        beforeAgent true
+                        expression {
+                            params.run_gcc
+                        }
+                    }
                     agent {
                         docker {
                             image 'stanorg/ci:bleeding-edge-compilers'
@@ -462,8 +513,8 @@ pipeline {
                                     make print-compiler-flags
                                     make -j4 examples/bernoulli/bernoulli; ./bin/stanc --version; cd ..
                                     echo "STANCFLAGS += --O1" >> cmdstan/make/local
-                                    ./runPerformanceTests.py -j${env.PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
-                                    ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 ../stanc3/test/integration/good
+                                    ./runPerformanceTests.py -j${PARALLEL} --overwrite-golds --runs=0 --tests-file all.tests --num-samples=20
+                                    ./runPerformanceTests.py -j${PARALLEL} --runs=0 ../stanc3/test/integration/good
                                 """
                             }
 
@@ -484,15 +535,10 @@ pipeline {
         }
 
     }
-    //post {
-    //    always {
-    //        node("linux") {
-    //            recordIssues enabledForFailure: false, tool: clang()
-    //        }
-    //   }
-    //    success { script { utils.mailBuildResults("SUCCESSFUL") } }
-    //    unstable { script { utils.mailBuildResults("UNSTABLE") } }
-    //    failure { script { utils.mailBuildResults("FAILURE") } }
-    //}
+    post {
+       success { script { utils.mailBuildResults("SUCCESSFUL") } }
+       unstable { script { utils.mailBuildResults("UNSTABLE") } }
+       failure { script { utils.mailBuildResults("FAILURE") } }
+    }
 }
 
