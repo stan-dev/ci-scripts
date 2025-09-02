@@ -29,19 +29,6 @@ cd $INSTALLATION_HOME/.cmdstan; tar -cf - cmdstan-$VERSION | gzip > $INSTALLATIO
 tar -tzf $INSTALLATION_HOME/cmdstan-$VERSION.tgz | head
 
 FILE="/root/cmdstan-$VERSION.tgz"
-URL="https://file.io"
-DEFAULT_EXPIRE="1d"
 
-RESPONSE=$(curl -# -F "file=@${FILE}" "${URL}/?expires=${DEFAULT_EXPIRE}")
-
-RETURN=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->success;')
-
-if [ "1" != "$RETURN" ]; then
-    echo "An error occured!\nResponse: ${RESPONSE}"
-    exit 1
-fi
-
-KEY=$(echo "$RESPONSE" | php -r 'echo json_decode(fgets(STDIN))->key;')
-EXPIRY=$(echo "${RESPONSE}" | php -r 'echo json_decode(fgets(STDIN))->link;')
-
-echo "${URL}/${KEY}"  # to terminal
+RESPONSE=$(curl bashupload.com -T "${FILE}")
+echo "${RESPONSE}"
