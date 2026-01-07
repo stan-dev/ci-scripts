@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 if [ "$#" -ne 1 ]; then
     echo "ERROR: Please specify a version."
     exit 2
