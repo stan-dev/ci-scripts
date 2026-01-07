@@ -7,10 +7,9 @@
 - [ ] Create a release candidate tarball for x86. Make sure RC tarballs include stanc3 binaries.
 - [ ] Check external links in docs (i.e. TBB docs link) - use https://github.com/tcort/markdown-link-check
 - [ ] Create a release candidate feature/bugfix list (major features/bugfixes that need testing, link to new docs in Github)
-- [ ] Run [CmdStanR tests](https://github.com/stan-dev/cmdstanr/actions/workflows/cmdstan-tarball-check.yaml) with the RC tarball.
-- [ ] Run CmdStanPy tests with the RC tarball.
+- [ ] Run [CmdStanR tests](https://github.com/stan-dev/cmdstanr/actions/workflows/R-CMD-check.yaml) with the RC tarball.
+- [ ] Run [CmdStanPy tests](https://github.com/stan-dev/cmdstanpy/actions/workflows/main.yml) with the RC tarball.
 - [ ] Make a Discourse RC post.
-- [ ] Post a tweet with a link to the Discourse RC post.
 
 **Release (INSERT DATE HERE):**
 - [ ] Create the Math Release notes.
@@ -24,7 +23,6 @@
 - [ ] Create the Stanc3 release.
 - [ ] Create x86 CmdStan tarballs (check version, check that the extracted folder is in the cmdstan-version format).
 - [ ] Create non-x86 CmdStan tarballs.
-- [ ] Run CmdStanR tests with the release tarball.
+- [ ] Run CmdStanR/Py tests with the release tarball.
 - [ ] Make a Stan blog release announcement post (thank the sponsors and all contributors, mention new devs).
 - [ ] Link to the blog post in a Discourse thread.
-- [ ] Make a Twitter announcement.
