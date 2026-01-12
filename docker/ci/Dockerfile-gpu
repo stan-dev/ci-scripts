@@ -16,6 +16,9 @@ ENV LLD_VERSION="7"
 ENV OPENMPI_VERSION="4.1"
 ENV OPENMPI_MINOR_VERSION="2"
 
+# CMake
+ENV CMAKE_VERSION="3.30.5"
+
 # OpenCL™ 2.0 Driver for Intel® HD, Iris™, and Iris™ Pro Graphics for Linux* (64-bit)
 ENV INTEL_DRIVER_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vcp/15532/l_opencl_p_18.1.0.015.tgz
 # Intel® SDK for OpenCL™ Applications 2016 R2 for Linux* (64 bit)
@@ -23,7 +26,7 @@ ENV INTEL_SDK_URL=https://registrationcenter-download.intel.com/akdlm/irc_nas/vc
 
 # Install os dependencies and pip3
 RUN apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* && update-ca-certificates && apt-get update -y
-RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip -y
+RUN apt-get install nano alien bash dpkg git make curl wget cmake autoconf vim automake python3 python3-pip build-essential libssl-dev -y
 RUN apt-get install nvidia-driver-460 cuda-drivers-460 intel-opencl-icd nvidia-cuda-toolkit opencl-headers clinfo -y
 RUN apt-get install binutils clang-format clang-${CLANG_VERSION} clang++-${CLANG_VERSION} gcc lld-${LLD_VERSION} lld -y
 RUN apt-get install libxml2-dev linux-headers-generic libopenmpi-dev libxslt-dev mpi mpich -y
@@ -117,13 +120,20 @@ CONTINUE_WITH_INSTALLDIR_OVERWRITE=yes \n\
 COMPONENTS=DEFAULTS \n\
 PSET_MODE=install' > silent_install.cfg
 
-RUN wget ${INTEL_SDK_URL}
+# RUN wget ${INTEL_SDK_URL}
 
 # Install SDK
-RUN TARBALL=$(basename ${INTEL_SDK_URL}) \
- && DIR=$(basename ${INTEL_SDK_URL} .tar.gz) \
- && tar zxvf ${TARBALL} \
- && cd ${DIR} && ./install.sh --silent ../silent_install.cfg
+# Intel® SDK for OpenCL™ applications is not being mantained anymore and has been discontinued by Intel
+# They recommend using: https://github.com/intel/compute-runtime/releases
+# We're almost certain it's not used anymore so we will try without!
+#RUN TARBALL=$(basename ${INTEL_SDK_URL}) \
+# && DIR=$(basename ${INTEL_SDK_URL} .tar.gz) \
+# && tar zxvf ${TARBALL} \
+# && cd ${DIR} && ./install.sh --silent ../silent_install.cfg
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
+RUN tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
+RUN cd cmake-${CMAKE_VERSION} && ./bootstrap && make && sudo make install && cmake --version
 
 # Set our working directory
 WORKDIR /workdir
