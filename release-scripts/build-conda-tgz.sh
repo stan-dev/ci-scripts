@@ -5,10 +5,12 @@
 # Arguments:
 # $1: cmdstan version in the form of 2.29.0 (major.minor.patch)
 
-# On a fresh colab instance simply run:
+### On a fresh colab instance simply run:
 # !curl https://raw.githubusercontent.com/stan-dev/ci-scripts/master/release-scripts/build-conda-tgz.sh | bash -s -- 2.29.0
+# from google.colab import files
+# files.download('file.txt')
+###
 # You can follow all the progress in the console, should take around 10 minutes
-# At the end the console will print a URL where you can download the .tgz archive
 
 # Install php
 apt install php
@@ -30,5 +32,3 @@ tar -tzf $INSTALLATION_HOME/cmdstan-$VERSION.tgz | head
 
 FILE="/root/cmdstan-$VERSION.tgz"
 
-RESPONSE=$(curl bashupload.com -T "${FILE}")
-echo "${RESPONSE}"
