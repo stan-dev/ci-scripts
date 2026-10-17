@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 echo "${CUSTOM_GCC_TAG}"
 

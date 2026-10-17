@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 echo "${CUSTOM_LLVM_TAG}"
 
@@ -13,17 +13,15 @@ fi
 echo "${LATEST_RELEASE_VERSION}"
 
 git clone -b "llvmorg-${LATEST_RELEASE_VERSION}" --depth=1 https://github.com/llvm/llvm-project.git
+prefix=$PWD/llvm
 cd llvm-project
 mkdir build
 cd build
 
-cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" ../llvm
+cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$prefix -G "Unix Makefiles" ../llvm
 make clang -j8
 clang --help
-cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;third-party;test-suite" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang
+cmake -G Ninja -S ../runtimes -B build -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;third-party;test-suite" -D CMAKE_CXX_COMPILER=clang++ -D CMAKE_C_COMPILER=clang -DCMAKE_INSTALL_PREFIX=$prefix
 ninja -C build cxx cxxabi unwind
 ninja -C build check-cxx check-cxxabi check-unwind
 ninja -C build install-cxx install-cxxabi install-unwind
-ldconfig /usr/local/lib
-
-cd ../../
