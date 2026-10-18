@@ -181,6 +181,7 @@ jobs:
             rec_deps[rec_deps == "infinitefactor"] <- "github::poworoznek/infinitefactor"
             rec_deps[rec_deps == "survHEinla"] <- "github::giabaio/survHEinla"
             rec_deps[rec_deps == "SBC"] <- "github::hyunjimoon/SBC"
+            rec_deps[rec_deps == "TSrepr"] <- "github::PetoLau/TSrepr"
 
             pak::pak(rec_deps)
           }
