@@ -62,20 +62,21 @@ def checkoutRepo(String repo, String branch = 'master') {
       submodule(shallow: true, depth: 8, recursiveSubmodules: true)])
 }
 
-def getLatest(String repo, String prefix) {
+def getLatest(String repo, java.util.regex.Pattern pat) {
   def resp = httpRequest url: "https://api.github.com/repos/${repo}/tags", acceptType: 'APPLICATION_JSON'
   def tags = readJSON text: resp.content
-  // the old jq code uses the first, not the greatest, so do the same:
-  def tag = tags.find { t -> t.name.startsWith(prefix) }
-  def name = tag.name.minus(prefix)
-  println("Found latest $repo tag $name")
-  return name
+  def tag = tags.findResult { t ->
+    def m = t.name =~ pat
+    m ? m[0][1] : null
+  }
+  println("Found latest $repo tag $tag")
+  return tag
 }
 
 catchError {
   stage('Build image') {
-    def gcc_tag  = params.custom_gcc_tag  ?: getLatest("gcc-mirror/gcc", "releases/gcc-")
-    def llvm_tag = params.custom_llvm_tag ?: getLatest("llvm/llvm-project", "llvmorg-")
+    def gcc_tag  = params.custom_gcc_tag  ?: getLatest("gcc-mirror/gcc", ~'^releases/gcc-([0-9]+\\.[0-9]+\\.[0-9])$')
+    def llvm_tag = params.custom_llvm_tag ?: getLatest("llvm/llvm-project", ~'^llvmorg-([0-9]+\\.[0-9]+\\.[0-9])$')
 
     buildImage(context: 'docker/bleeding-edge-compilers',
       buildArgs: "--build-arg CUSTOM_GCC_TAG=$gcc_tag --build-arg CUSTOM_LLVM_TAG=$llvm_tag")
