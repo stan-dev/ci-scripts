@@ -98,6 +98,16 @@ ENV OPAL_PREFIX="/opt/openmpi" \
     LD_LIBRARY_PATH="/opt/openmpi/lib"
 # export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/openmpi/lib:/usr/lib:/usr/lib/x86_64-linux-gnu"
 
+# Install the mold linker from the upstream release (Ubuntu 20.04 has no mold package)
+# clang: -fuse-ld=mold
+# gcc < 12: -B/usr/local/libexec/mold
+ENV MOLD_VERSION="3.0.0"
+RUN wget https://github.com/rui314/mold/releases/download/v${MOLD_VERSION}/mold-${MOLD_VERSION}-x86_64-linux.tar.gz && \
+    tar -xzf mold-${MOLD_VERSION}-x86_64-linux.tar.gz -C /usr/local --strip-components=1 && \
+    rm -f mold-${MOLD_VERSION}-x86_64-linux.tar.gz && \
+    mold --version && \
+    ld.mold --version
+
 # Print version information
 
 # Run MPI hello.c test
